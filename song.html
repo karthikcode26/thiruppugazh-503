@@ -46,28 +46,11 @@
           }
           document.title = `${song.num}. ${song.t} | திருப்புகழ்`;
 
-          // Video: if this song has a Google Drive file id (song.v), use it.
-          // Drive "/preview" plays inline; "/view" opens Drive in a new tab.
-          // Songs without a video fall back to a YouTube search.
-          const hasVideo = !!song.v;
-          const drivePreview = hasVideo ? `https://drive.google.com/file/d/${song.v}/preview` : "";
-          const driveOpen = hasVideo ? `https://drive.google.com/file/d/${song.v}/view` : "";
+          // Link each song to a YouTube search for that song. This opens the
+          // YouTube app/site (reliable on iPhone), needs no login, and points
+          // to the original creators' videos.
           const ytQuery = encodeURIComponent(`Thiruppugazh ${song.t} திருப்புகழ்`);
           const youtubeUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
-
-          const videoButton = hasVideo
-            ? `<a class="btn btn-youtube" href="${driveOpen}" target="_blank" rel="noopener">
-                 <span class="ico">▶</span>
-                 <span class="label">காணொளி (Watch Video)
-                   <span class="hint">Google Drive இல் திறக்கும்</span>
-                 </span>
-               </a>`
-            : `<a class="btn btn-youtube" href="${youtubeUrl}" target="_blank" rel="noopener">
-                 <span class="ico">▶</span>
-                 <span class="label">YouTube இல் தேடு (Search)
-                   <span class="hint">இந்த பாடலுக்கு காணொளி இன்னும் சேர்க்கப்படவில்லை</span>
-                 </span>
-               </a>`;
 
           detail.innerHTML = `
             <a class="back" href="index.html">‹ பட்டியல் · Back to list</a>
@@ -78,15 +61,13 @@
               <div class="oldno">பாடல் எண் ${song.num}</div>
             </section>
 
-            ${hasVideo ? `<div class="videowrap"><iframe
-                src="${drivePreview}"
-                allow="autoplay"
-                allowfullscreen
-                loading="lazy"
-                title="Video for song ${song.num}"></iframe></div>` : ""}
-
             <div class="actions">
-              ${videoButton}
+              <a class="btn btn-youtube" href="${youtubeUrl}" target="_blank" rel="noopener">
+                <span class="ico">▶</span>
+                <span class="label">YouTube இல் பார்/கேள்
+                  <span class="hint">இந்த பாடலை YouTube இல் தேடும்</span>
+                </span>
+              </a>
             </div>
           `;
         })
