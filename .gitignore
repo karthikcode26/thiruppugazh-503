@@ -1,0 +1,8 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
+
+# Local audio uploads (optional; can be large — host on S3 instead)
+# Uncomment the next line if you don't want audio files in git:
+# audio/
