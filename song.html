@@ -48,13 +48,29 @@
           document.title = `${song.num}. ${song.t} | திருப்புகழ்`;
 
           const lyricsUrl = window.kaumaramUrl(song.k);
-          // YouTube: a search link scoped to this song (works without needing exact video IDs yet)
+
+          // Video: if this song has a Google Drive file id (song.v), use it.
+          // Drive "/preview" plays inline; "/view" opens Drive in a new tab.
+          // Songs without a video fall back to a YouTube search.
+          const hasVideo = !!song.v;
+          const drivePreview = hasVideo ? `https://drive.google.com/file/d/${song.v}/preview` : "";
+          const driveOpen = hasVideo ? `https://drive.google.com/file/d/${song.v}/view` : "";
           const ytQuery = encodeURIComponent(`Thiruppugazh ${song.t} திருப்புகழ்`);
           const youtubeUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
 
-          // Audio: look for an optional local file audio/<num>.mp3.
-          // If you later upload files (e.g. to AWS S3), they will play here automatically.
-          const audioSrc = `audio/${song.num}.mp3`;
+          const videoButton = hasVideo
+            ? `<a class="btn btn-youtube" href="${driveOpen}" target="_blank" rel="noopener">
+                 <span class="ico">▶</span>
+                 <span class="label">காணொளி (Watch Video)
+                   <span class="hint">Google Drive இல் திறக்கும்</span>
+                 </span>
+               </a>`
+            : `<a class="btn btn-youtube" href="${youtubeUrl}" target="_blank" rel="noopener">
+                 <span class="ico">▶</span>
+                 <span class="label">YouTube இல் தேடு (Search)
+                   <span class="hint">இந்த பாடலுக்கு காணொளி இன்னும் சேர்க்கப்படவில்லை</span>
+                 </span>
+               </a>`;
 
           detail.innerHTML = `
             <a class="back" href="index.html">‹ பட்டியல் · Back to list</a>
@@ -65,6 +81,13 @@
               <div class="oldno">பாடல் எண் ${song.num} · kaumaram #${song.k}</div>
             </section>
 
+            ${hasVideo ? `<div class="videowrap"><iframe
+                src="${drivePreview}"
+                allow="autoplay"
+                allowfullscreen
+                loading="lazy"
+                title="Video for song ${song.num}"></iframe></div>` : ""}
+
             <div class="actions">
               <a class="btn btn-lyrics" href="${lyricsUrl}" target="_blank" rel="noopener">
                 <span class="ico">📖</span>
@@ -73,33 +96,9 @@
                 </span>
               </a>
 
-              <a class="btn btn-youtube" href="${youtubeUrl}" target="_blank" rel="noopener">
-                <span class="ico">▶</span>
-                <span class="label">YouTube
-                  <span class="hint">இந்த பாடலை YouTube இல் கேளுங்கள்</span>
-                </span>
-              </a>
-            </div>
-
-            <div class="player">
-              <div id="playerInner">
-                <div class="noaudio">🎵 Checking for audio…</div>
-              </div>
+              ${videoButton}
             </div>
           `;
-
-          // Probe whether an audio file exists; only show the player if it does.
-          const probe = new Audio();
-          const inner = document.getElementById("playerInner");
-          probe.addEventListener("canplaythrough", () => {
-            inner.innerHTML = `<audio controls preload="none" src="${audioSrc}">
-              Your browser does not support audio.
-            </audio>`;
-          });
-          probe.addEventListener("error", () => {
-            inner.innerHTML = `<div class="noaudio">🔇 ஒலிக்கோப்பு இன்னும் சேர்க்கப்படவில்லை<br>Audio not added yet for this song.</div>`;
-          });
-          probe.src = audioSrc;
         })
         .catch(() => {
           detail.innerHTML = '<a class="back" href="index.html">‹ Back</a><p class="empty">Could not load songs.json.</p>';
