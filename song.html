@@ -22,8 +22,7 @@
     </main>
 
     <footer class="footer">
-      Lyrics &amp; audio courtesy of
-      <a href="https://kaumaram.com" target="_blank" rel="noopener">kaumaram.com</a>.
+      அருணகிரிநாதர் திருப்புகழ்
     </footer>
   </div>
 
@@ -46,8 +45,6 @@
             return;
           }
           document.title = `${song.num}. ${song.t} | திருப்புகழ்`;
-
-          const lyricsUrl = window.kaumaramUrl(song.k);
 
           // Video: if this song has a Google Drive file id (song.v), use it.
           // Drive "/preview" plays inline; "/view" opens Drive in a new tab.
@@ -78,7 +75,7 @@
             <section class="songcard">
               <div class="bignum">${song.num}</div>
               <div class="bigtitle">${esc(song.t)}</div>
-              <div class="oldno">பாடல் எண் ${song.num} · kaumaram #${song.k}</div>
+              <div class="oldno">பாடல் எண் ${song.num}</div>
             </section>
 
             ${hasVideo ? `<div class="videowrap"><iframe
@@ -89,13 +86,6 @@
                 title="Video for song ${song.num}"></iframe></div>` : ""}
 
             <div class="actions">
-              <a class="btn btn-lyrics" href="${lyricsUrl}" target="_blank" rel="noopener">
-                <span class="ico">📖</span>
-                <span class="label">பாடல் வரிகள் (Lyrics)
-                  <span class="hint">kaumaram.com இல் திறக்கும்</span>
-                </span>
-              </a>
-
               ${videoButton}
             </div>
           `;
