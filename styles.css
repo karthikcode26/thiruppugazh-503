@@ -258,26 +258,40 @@ html, body {
   margin: 4px 0 2px;
 }
 .songcard .oldno { font-size: 13px; color: var(--muted); }
-.fav-toggle {
+.card-actions {
   margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.fav-toggle, .share-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   min-height: var(--tap);
   padding: 8px 18px;
-  border: 1px solid var(--gold);
   border-radius: 999px;
-  background: #fffdf8;
-  color: var(--accent-dark);
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
+.fav-toggle {
+  border: 1px solid var(--gold);
+  background: #fffdf8;
+  color: var(--accent-dark);
+}
 .fav-toggle .fav-ico { font-size: 20px; color: var(--gold); line-height: 1; }
 .fav-toggle.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .fav-toggle.on .fav-ico { color: #fff; }
-.fav-toggle:active { transform: scale(.98); }
+.fav-toggle:active, .share-btn:active { transform: scale(.98); }
+.share-btn {
+  border: 1px solid #1ebe57;
+  background: #25d366;   /* WhatsApp green */
+  color: #fff;
+}
+.share-btn .share-ico { font-size: 18px; line-height: 1; }
 
 /* ---- Action buttons ---- */
 .actions { display: flex; flex-direction: column; gap: 12px; }
