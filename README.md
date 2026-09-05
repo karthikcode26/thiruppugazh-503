@@ -108,22 +108,29 @@ PDF pages 313-516 -> songs 298-501
 Run on the machine with the PDF:
 
 ```bash
-python3 -m pip install --user pymupdf
+python3 -m pip install --user pymupdf pillow
 
 # 1. Validate the map and print sample song -> page pairs to spot-check
 python3 tools/render_lyric_images.py check --pdf "ThiruppugazhTamil.pdf"
 
-# 2. Render one image per song
+# 2. Render one image per song (auto-crops white margins at 200 DPI)
 python3 tools/render_lyric_images.py render --pdf "ThiruppugazhTamil.pdf"
 
 # 3. Confirm all 503 images exist, then spot-check several against the book
 python3 tools/render_lyric_images.py verify
 ```
 
+By default `render` uses 200 DPI and trims the surrounding white margins with
+Pillow so the lyrics fill the frame. Options:
+
+- `--no-crop` keeps the full page (skips Pillow).
+- `--margin N` sets the white border kept around the text (default 24 px).
+- `--dpi N` changes sharpness/size (higher = crisper and larger).
+
 If a spot-check ever shows a page is off, edit only `PAGE_MAP_RANGES` and
-re-render. The song page shows `lyrics/<num>.png` above the video so you can read
-along while it plays. Only publish content you have the right to republish;
-Arunagirinathar's verses are public domain.
+re-render. The song page shows `lyrics/<num>.png` above the video (tap to zoom)
+so you can read along while it plays. Only publish content you have the right to
+republish; Arunagirinathar's verses are public domain.
 
 ## Add lyrics from a public-domain PDF (text extraction)
 

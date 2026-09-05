@@ -85,10 +85,16 @@
 
             <section class="lyrics" id="lyrics">
               <h2 class="lyrics-title">பாடல் வரிகள் · Lyrics</h2>
-              <img class="lyrics-image" id="lyrics-image"
-                   src="lyrics/${song.num}.png"
-                   alt="${esc(song.t)} பாடல் வரிகள்"
-                   onerror="var s=document.getElementById('lyrics'); if(s) s.hidden=true;" />
+              <div class="lyrics-imagewrap">
+                <input type="checkbox" class="lyrics-zoom" id="lyrics-zoom" aria-hidden="true" />
+                <label for="lyrics-zoom">
+                  <img class="lyrics-image" id="lyrics-image"
+                       src="lyrics/${song.num}.png"
+                       alt="${esc(song.t)} பாடல் வரிகள்"
+                       onerror="var s=document.getElementById('lyrics'); if(s) s.hidden=true;" />
+                </label>
+              </div>
+              <p class="lyrics-hint">படத்தைத் தட்டி பெரிதாக்குங்கள் · Tap the lyrics to zoom</p>
             </section>
 
             ${videoContent}

@@ -39,7 +39,7 @@ DEFAULT_SONGS = ROOT / "songs.json"
 DEFAULT_LYRICS_DIR = ROOT / "lyrics"
 EXPECTED_SONG_COUNT = 503
 MANIFEST_NAME = "manifest.json"
-DEFAULT_DPI = 150
+DEFAULT_DPI = 200
 
 # Human-verified ranges. Each entry maps an inclusive 1-based PDF page range to
 # an inclusive song-number range. Sizes must match within each entry. Edit only
@@ -72,6 +72,41 @@ def build_song_to_page() -> dict[int, int]:
                 raise ValueError(f"Song {song} is mapped by more than one range")
             song_to_page[song] = page
     return song_to_page
+
+
+def make_cropper(margin: int = 24, white_threshold: int = 245):
+    """Return a function that trims near-white margins around a saved PNG.
+
+    Uses Pillow. The image is converted to grayscale to find the bounding box of
+    any pixel darker than white_threshold (the printed text), then cropped to
+    that box plus a small uniform margin so the lyrics fill the frame.
+    """
+    try:
+        from PIL import Image, ImageChops, ImageOps  # noqa: F401
+    except ImportError as exc:  # pragma: no cover - environment dependent
+        raise RuntimeError(
+            "Pillow is required for cropping. Install it with:\n"
+            "  python3 -m pip install --user pillow\n"
+            "Or run render with --no-crop to skip trimming."
+        ) from exc
+    from PIL import Image, ImageChops
+
+    def crop(path: Path) -> None:
+        with Image.open(path) as image:
+            rgb = image.convert("RGB")
+            gray = rgb.convert("L")
+            # Anything darker than the threshold counts as content.
+            mask = gray.point(lambda value: 0 if value >= white_threshold else 255)
+            bbox = mask.getbbox()
+            if not bbox:
+                return  # blank page; leave as-is
+            left = max(bbox[0] - margin, 0)
+            top = max(bbox[1] - margin, 0)
+            right = min(bbox[2] + margin, rgb.width)
+            bottom = min(bbox[3] + margin, rgb.height)
+            rgb.crop((left, top, right, bottom)).save(path, optimize=True)
+
+    return crop
 
 
 def load_songs(path: Path) -> list[dict[str, Any]]:
@@ -146,10 +181,14 @@ def render_command(args: argparse.Namespace) -> int:
         zoom = args.dpi / 72.0
         matrix = fitz.Matrix(zoom, zoom)
         written = 0
+        cropper = make_cropper(margin=args.margin) if not args.no_crop else None
         for song in range(1, EXPECTED_SONG_COUNT + 1):
             page_index = song_to_page[song] - 1  # 1-based map -> 0-based index
             pixmap = doc[page_index].get_pixmap(matrix=matrix, alpha=False)
-            pixmap.save(str(args.lyrics_dir / f"{song}.png"))
+            out_path = args.lyrics_dir / f"{song}.png"
+            pixmap.save(str(out_path))
+            if cropper is not None:
+                cropper(out_path)
             written += 1
 
     produced = sorted(
@@ -220,6 +259,14 @@ def build_parser() -> argparse.ArgumentParser:
     render_parser.add_argument("--songs", type=path_arg, default=DEFAULT_SONGS)
     render_parser.add_argument("--lyrics-dir", type=path_arg, default=DEFAULT_LYRICS_DIR)
     render_parser.add_argument("--dpi", type=int, default=DEFAULT_DPI)
+    render_parser.add_argument(
+        "--margin", type=int, default=24,
+        help="White-space margin (pixels) kept around the cropped lyrics",
+    )
+    render_parser.add_argument(
+        "--no-crop", action="store_true",
+        help="Skip auto-cropping the white margins (keeps the full page)",
+    )
     render_parser.set_defaults(func=render_command)
 
     verify_parser = subparsers.add_parser("verify", help="Check produced images")
