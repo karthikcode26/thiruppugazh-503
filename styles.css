@@ -89,6 +89,7 @@ html, body {
 }
 
 /* ---- Shelves (recently viewed / favourites) ---- */
+[hidden] { display: none !important; }
 .shelf {
   padding: 10px 14px 2px;
 }
