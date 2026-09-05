@@ -24,8 +24,9 @@ corresponding video from the complete public YouTube playlist.
 | `songs.json` | Production song data, including imported YouTube IDs. |
 | `tools/import_youtube_playlist.py` | Maps playlist videos from numeric title prefixes to exact song IDs. |
 | `YOUTUBE_PLAYLIST.md` | One-time playlist import instructions. |
-| `tools/extract_lyrics.py` | Extracts one lyrics file per song from a text-based PDF book. |
-| `lyrics/<num>.txt` | Per-song public-domain lyrics, loaded on demand by the song page. |
+| `tools/render_lyric_images.py` | Renders each song's PDF page(s) to `lyrics/<num>.png` (works with the broken-font book). |
+| `tools/extract_lyrics.py` | Alternative: extracts selectable text (only if the PDF font decodes cleanly). |
+| `lyrics/<num>.png` / `lyrics/<num>.txt` | Per-song public-domain lyrics, shown above the video on the song page. |
 | `deploy.sh` | Safely deploys the public runtime files and `lyrics/*.txt` to the S3 bucket. |
 | `tools/extract_links.py` / `links.csv` | Historical Google Drive artifacts; not used by the live site. |
 
@@ -87,7 +88,34 @@ Until the networked import is run and its `songs.json` change is reviewed, the
 base dataset intentionally shows the full-playlist and search options instead
 of guessing or embedding an unverified video.
 
-## Add lyrics from a public-domain PDF
+## Add lyrics as page images (recommended for this book)
+
+This book's PDF uses a legacy TSCu Tamil font whose extractable text is
+scrambled, so selectable-text extraction is unreliable. Rendering each song's
+page to an image captures the lyrics exactly as printed. Each page's song number
+is printed in a clean numeric header (`பாடல் N`), which the tool reads to name
+each image `lyrics/<N>.png`. Run on the machine with the PDF:
+
+```bash
+python3 -m pip install --user pymupdf
+
+# 1. Confirm detected song pages (must show ~503 and no non-consecutive songs)
+python3 tools/render_lyric_images.py inspect --pdf "ThiruppugazhTamil.pdf"
+
+# 2. Render one image per song
+python3 tools/render_lyric_images.py render --pdf "ThiruppugazhTamil.pdf"
+
+# 3. Check the result, then open a few images by hand
+python3 tools/render_lyric_images.py verify
+```
+
+`render` refuses to run if too few songs are detected or if any song maps to
+non-consecutive pages (a sign an extra page was misread), so a bad mapping is
+caught before publishing. The song page shows `lyrics/<num>.png` above the video
+so you can read along while it plays. Only publish content you have the right to
+republish; Arunagirinathar's verses are public domain.
+
+## Add lyrics from a public-domain PDF (text extraction)
 
 The book prints the song number at the top of each song's page and has
 selectable (text-based) content, so lyrics can be extracted without OCR. Pages

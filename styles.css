@@ -272,6 +272,14 @@ html, body {
   line-height: 1.8;
   color: var(--ink);
 }
+.lyrics-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
 
 /* ---- Audio player ---- */
 .player {

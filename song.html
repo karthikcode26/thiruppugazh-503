@@ -83,25 +83,19 @@
               <div class="oldno">பாடல் எண் ${song.num}</div>
             </section>
 
-            ${videoContent}
-
             <section class="lyrics" id="lyrics" hidden>
               <h2 class="lyrics-title">பாடல் வரிகள் · Lyrics</h2>
-              <div class="lyrics-body" id="lyrics-body"></div>
+              <img class="lyrics-image" id="lyrics-image" alt="${esc(song.t)} பாடல் வரிகள்" loading="lazy" />
             </section>
+
+            ${videoContent}
           `;
 
           const lyricsSection = document.getElementById("lyrics");
-          const lyricsBody = document.getElementById("lyrics-body");
-          fetch(`lyrics/${song.num}.txt`)
-            .then(response => (response.ok ? response.text() : ""))
-            .then(text => {
-              const trimmed = text.trim();
-              if (!trimmed) return;
-              lyricsBody.textContent = trimmed;
-              lyricsSection.hidden = false;
-            })
-            .catch(() => {});
+          const lyricsImage = document.getElementById("lyrics-image");
+          lyricsImage.addEventListener("load", () => { lyricsSection.hidden = false; });
+          lyricsImage.addEventListener("error", () => { lyricsSection.hidden = true; });
+          lyricsImage.src = `lyrics/${song.num}.png`;
         })
         .catch(() => {
           detail.innerHTML = '<a class="back" href="index.html">‹ Back</a><p class="empty">Could not load songs.json.</p>';
