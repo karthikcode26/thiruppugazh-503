@@ -2,6 +2,11 @@
 set -euo pipefail
 
 BUCKET="thiruppugazh-503-us-east-1-first-site"
+# Once the CloudFront distribution exists, set its ID here (or export
+# CLOUDFRONT_DISTRIBUTION_ID before running) so each deploy clears the CDN cache
+# and changes appear immediately. Leave empty until CloudFront is set up.
+CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID:-}"
+SITE_URL="${SITE_URL:-http://${BUCKET}.s3-website-us-east-1.amazonaws.com}"
 DRY_RUN=""
 
 if [[ "${1:-}" == "--dry-run" ]]; then
@@ -45,7 +50,21 @@ if [[ -d lyrics ]]; then
 fi
 
 if [[ -n "$DRY_RUN" ]]; then
-  echo "Dry run complete. Only the five public site files and lyrics/*.txt above would be uploaded."
-else
-  echo "Deployment complete: http://${BUCKET}.s3-website-us-east-1.amazonaws.com"
+  echo "Dry run complete. Only the public site files and lyrics/*.txt/*.png above would be uploaded."
+  if [[ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]]; then
+    echo "(Would also invalidate CloudFront distribution ${CLOUDFRONT_DISTRIBUTION_ID}.)"
+  fi
+  exit 0
 fi
+
+# Clear the CloudFront cache so visitors get the new files right away. Skipped
+# until a distribution ID is configured (before HTTPS/CloudFront is set up).
+if [[ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]]; then
+  echo "Invalidating CloudFront cache (${CLOUDFRONT_DISTRIBUTION_ID}) ..."
+  aws cloudfront create-invalidation \
+    --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+    --paths "/*" >/dev/null
+  echo "CloudFront cache invalidation requested."
+fi
+
+echo "Deployment complete: ${SITE_URL}"
