@@ -5,7 +5,8 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 
-# Local YouTube discovery/review artifacts (may contain API response metadata)
+# Local YouTube reports and review artifacts
+youtube_playlist.csv
 youtube_candidates.csv
 youtube_review.html
 youtube_approvals.csv

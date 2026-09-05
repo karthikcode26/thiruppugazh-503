@@ -232,11 +232,12 @@ html, body {
 }
 .video-pending {
   margin: 0 0 18px;
-  padding: 14px;
+  padding: 16px;
   color: var(--muted);
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
   text-align: center;
   font-size: 14px;
 }

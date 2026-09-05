@@ -12,8 +12,8 @@ elif [[ -n "${1:-}" ]]; then
 fi
 
 # Deliberately deploy only public runtime assets. Do not replace this with
-# `aws s3 sync .`: the working tree can contain ignored API keys, candidate
-# metadata, review files, and approvals that must never be made public.
+# `aws s3 sync .`: the working tree can contain ignored API keys, playlist
+# metadata, and review files that must never be made public.
 PUBLIC_FILES=(
   index.html
   song.html
