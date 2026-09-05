@@ -58,8 +58,6 @@
             ? song.youtubeId
             : "";
           const isEmbeddable = !!videoId && song.youtubeEmbeddable === true;
-          const searchQuery = encodeURIComponent(`Thiruppugazh ${song.t} திருப்புகழ்`);
-          const searchUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
           const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
           const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : playlistUrl;
           const videoContent = isEmbeddable
@@ -74,7 +72,7 @@
               </div>`
             : videoId
               ? `<p class="video-pending">இந்த காணொளியை இங்கே இயக்க அனுமதி இல்லை.<br>Embedding is unavailable; open the exact video on YouTube below.</p>`
-              : `<p class="video-pending">503 பாடல் playlist இன்னும் தளத் தரவுடன் இணைக்கப்படவில்லை.<br>The verified playlist IDs have not been imported yet.</p>`;
+              : `<p class="video-pending">இந்த பாடலுக்கான காணொளி playlist இல் இன்னும் இல்லை.<br>This song's video is not in the playlist yet. Open the full playlist below.</p>`;
           const buttonLabel = videoId ? "YouTube இல் திற" : "முழு Playlist ஐ திற";
           const buttonHint = videoId
             ? "இந்த பாடலின் சரியான காணொளியைத் திறக்கும்"
@@ -96,12 +94,6 @@
                 <span class="ico">▶</span>
                 <span class="label">${buttonLabel}
                   <span class="hint">${buttonHint}</span>
-                </span>
-              </a>
-              <a class="btn btn-search" href="${searchUrl}" target="_blank" rel="noopener">
-                <span class="ico">⌕</span>
-                <span class="label">வேறு காணொளியைத் தேடு
-                  <span class="hint">இந்த பாடலுக்கான மற்ற YouTube காணொளிகளைத் தேடும்</span>
                 </span>
               </a>
             </div>
