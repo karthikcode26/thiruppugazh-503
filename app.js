@@ -71,6 +71,7 @@ let SONGS = [];
 const listEl = document.getElementById("list");
 const searchEl = document.getElementById("search");
 const countEl = document.getElementById("count");
+const store = window.TPStore || null;
 
 function render(items) {
   if (!items.length) {
@@ -78,15 +79,51 @@ function render(items) {
     countEl.textContent = "";
     return;
   }
-  const html = items.map((s) => `
-    <a class="song" href="song.html?n=${s.num}">
-      <span class="num">${s.num}</span>
-      <span class="title">${escapeHtml(s.t)}</span>
-      <span class="chev">›</span>
-    </a>`).join("");
-  // Using <a> directly as list rows; wrap for semantics
+  const html = items.map((s) => {
+    const fav = store && store.isFavourite(s.num);
+    return `
+    <li class="song-row">
+      <a class="song" href="song.html?n=${s.num}">
+        <span class="num">${s.num}</span>
+        <span class="title">${escapeHtml(s.t)}</span>
+        <span class="chev">›</span>
+      </a>
+      <button class="fav-btn${fav ? " on" : ""}" type="button"
+              data-num="${s.num}"
+              aria-pressed="${fav ? "true" : "false"}"
+              aria-label="Toggle favourite for song ${s.num}">${fav ? "★" : "☆"}</button>
+    </li>`;
+  }).join("");
   listEl.innerHTML = html;
   countEl.textContent = `${items.length} / ${SONGS.length} பாடல்கள்`;
+}
+
+function songByNum(num) {
+  return SONGS.find((s) => s.num === Number(num));
+}
+
+function renderShelf(shelfId, chipsId, nums) {
+  const shelf = document.getElementById(shelfId);
+  const chips = document.getElementById(chipsId);
+  if (!shelf || !chips) return;
+  const valid = (nums || []).map(songByNum).filter(Boolean);
+  if (!valid.length) {
+    shelf.hidden = true;
+    chips.innerHTML = "";
+    return;
+  }
+  chips.innerHTML = valid.map((s) => `
+    <a class="chip" href="song.html?n=${s.num}">
+      <span class="chip-num">${s.num}</span>
+      <span class="chip-title">${escapeHtml(s.t)}</span>
+    </a>`).join("");
+  shelf.hidden = false;
+}
+
+function renderShelves() {
+  if (!store) return;
+  renderShelf("recent-shelf", "recent-chips", store.getRecent());
+  renderShelf("fav-shelf", "fav-chips", store.getFavourites());
 }
 
 function escapeHtml(str) {
@@ -110,7 +147,22 @@ function filter(q) {
 function init(data) {
   SONGS = data.map((s) => ({ ...s, _roman: translit(s.t) }));
   render(SONGS);
+  renderShelves();
   searchEl.addEventListener("input", () => render(filter(searchEl.value)));
+
+  // Favourite toggle (event delegation so it works after re-render).
+  if (store) {
+    listEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".fav-btn");
+      if (!btn) return;
+      const num = Number(btn.dataset.num);
+      const nowFav = store.toggleFavourite(num);
+      btn.classList.toggle("on", nowFav);
+      btn.textContent = nowFav ? "★" : "☆";
+      btn.setAttribute("aria-pressed", nowFav ? "true" : "false");
+      renderShelves();
+    });
+  }
 }
 
 fetch("songs.json")

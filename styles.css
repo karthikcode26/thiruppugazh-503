@@ -88,6 +88,59 @@ html, body {
   color: var(--muted);
 }
 
+/* ---- Shelves (recently viewed / favourites) ---- */
+.shelf {
+  padding: 10px 14px 2px;
+}
+.shelf-title {
+  margin: 0 2px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+.chip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.chip-num {
+  flex: 0 0 auto;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+.chip-title {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---- Song list ---- */
 .list {
   list-style: none;
@@ -95,7 +148,14 @@ html, body {
   padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
   flex: 1;
 }
+.song-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
 .song {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -104,13 +164,26 @@ html, body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 10px 14px;
-  margin-bottom: 8px;
   text-decoration: none;
   color: var(--ink);
   box-shadow: var(--shadow);
   transition: transform .05s ease;
 }
 .song:active { transform: scale(.99); }
+.fav-btn {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--gold);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.fav-btn.on { color: var(--accent); }
+.fav-btn:active { transform: scale(.92); }
 .song .num {
   flex: 0 0 auto;
   min-width: 40px;
@@ -184,6 +257,26 @@ html, body {
   margin: 4px 0 2px;
 }
 .songcard .oldno { font-size: 13px; color: var(--muted); }
+.fav-toggle {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 8px 18px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--accent-dark);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fav-toggle .fav-ico { font-size: 20px; color: var(--gold); line-height: 1; }
+.fav-toggle.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.fav-toggle.on .fav-ico { color: #fff; }
+.fav-toggle:active { transform: scale(.98); }
 
 /* ---- Action buttons ---- */
 .actions { display: flex; flex-direction: column; gap: 12px; }
