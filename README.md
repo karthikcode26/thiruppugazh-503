@@ -161,6 +161,14 @@ cannot silently produce garbage. Lyrics are written to `lyrics/<num>.txt` and
 displayed on demand by the song page. Only publish lyrics you have the right to
 republish; Arunagirinathar's original verses are public domain.
 
+## Cache busting
+
+`index.html` and `song.html` load `styles.css`, `store.js`, and `app.js` with a
+version query (e.g. `app.js?v=2`). Browsers (especially iOS Safari) cache these
+files aggressively; bumping the number forces every device to fetch the new
+version immediately. **When you change any of those three files, increment the
+`?v=` number in both HTML files** before deploying.
+
 ## Deploy to the existing S3 website
 
 The deployment script uploads only the five public runtime assets. It does not
