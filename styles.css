@@ -240,6 +240,15 @@ html, body {
   text-align: center;
   font-size: 14px;
 }
+.video-pending a {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  min-height: var(--tap);
+  line-height: var(--tap);
+}
 
 /* ---- Audio player ---- */
 .player {
