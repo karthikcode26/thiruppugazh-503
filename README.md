@@ -123,6 +123,8 @@ python3 tools/render_lyric_images.py verify
 By default `render` uses 200 DPI and trims the surrounding white margins with
 Pillow so the lyrics fill the frame. Options:
 
+- The "Home" navigation text printed on each page is painted over before
+  rendering (pass `--keep-home` to leave it).
 - `--no-crop` keeps the full page (skips Pillow).
 - `--margin N` sets the white border kept around the text (default 24 px).
 - `--dpi N` changes sharpness/size (higher = crisper and larger).
