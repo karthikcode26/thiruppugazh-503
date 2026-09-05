@@ -85,20 +85,26 @@
 
             <section class="lyrics" id="lyrics">
               <h2 class="lyrics-title">பாடல் வரிகள் · Lyrics</h2>
-              <div class="lyrics-imagewrap">
-                <input type="checkbox" class="lyrics-zoom" id="lyrics-zoom" aria-hidden="true" />
-                <label for="lyrics-zoom">
-                  <img class="lyrics-image" id="lyrics-image"
-                       src="lyrics/${song.num}.png"
-                       alt="${esc(song.t)} பாடல் வரிகள்"
-                       onerror="var s=document.getElementById('lyrics'); if(s) s.hidden=true;" />
-                </label>
+              <div class="lyrics-imagewrap" id="lyrics-wrap">
+                <img class="lyrics-image" id="lyrics-image"
+                     src="lyrics/${song.num}.png"
+                     alt="${esc(song.t)} பாடல் வரிகள்"
+                     onerror="var s=document.getElementById('lyrics'); if(s) s.hidden=true;" />
               </div>
               <p class="lyrics-hint">படத்தைத் தட்டி பெரிதாக்குங்கள் · Tap the lyrics to zoom</p>
             </section>
 
             ${videoContent}
           `;
+
+          const lyricsWrap = document.getElementById("lyrics-wrap");
+          const lyricsImage = document.getElementById("lyrics-image");
+          if (lyricsWrap && lyricsImage) {
+            lyricsImage.addEventListener("click", () => {
+              const zoomed = lyricsWrap.classList.toggle("zoomed");
+              lyricsImage.style.cursor = zoomed ? "zoom-out" : "zoom-in";
+            });
+          }
         })
         .catch(() => {
           detail.innerHTML = '<a class="back" href="index.html">‹ Back</a><p class="empty">Could not load songs.json.</p>';

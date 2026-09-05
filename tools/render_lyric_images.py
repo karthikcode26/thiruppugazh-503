@@ -74,6 +74,25 @@ def build_song_to_page() -> dict[int, int]:
     return song_to_page
 
 
+def cover_home_links(page) -> bool:
+    """Paint a white rectangle over the "Home" navigation text on a page.
+
+    "Home" is plain Latin text that extracts reliably, so we can find its exact
+    rectangle(s) and cover them before rendering. Returns True if anything was
+    covered. This runs before rendering so the auto-crop then tightens around
+    only the lyrics.
+    """
+    import fitz
+
+    covered = False
+    for rect in page.search_for("Home"):
+        # pad slightly so anti-aliased edges are fully covered
+        box = fitz.Rect(rect.x0 - 2, rect.y0 - 2, rect.x1 + 2, rect.y1 + 2)
+        page.draw_rect(box, color=(1, 1, 1), fill=(1, 1, 1), overlay=True)
+        covered = True
+    return covered
+
+
 def make_cropper(margin: int = 24, white_threshold: int = 245):
     """Return a function that trims near-white margins around a saved PNG.
 
@@ -182,9 +201,13 @@ def render_command(args: argparse.Namespace) -> int:
         matrix = fitz.Matrix(zoom, zoom)
         written = 0
         cropper = make_cropper(margin=args.margin) if not args.no_crop else None
+        home_removed = 0
         for song in range(1, EXPECTED_SONG_COUNT + 1):
             page_index = song_to_page[song] - 1  # 1-based map -> 0-based index
-            pixmap = doc[page_index].get_pixmap(matrix=matrix, alpha=False)
+            page = doc[page_index]
+            if not args.keep_home and cover_home_links(page):
+                home_removed += 1
+            pixmap = page.get_pixmap(matrix=matrix, alpha=False)
             out_path = args.lyrics_dir / f"{song}.png"
             pixmap.save(str(out_path))
             if cropper is not None:
@@ -208,6 +231,8 @@ def render_command(args: argparse.Namespace) -> int:
     )
 
     print(f"Rendered {written} song images to {args.lyrics_dir} at {args.dpi} DPI")
+    if not args.keep_home:
+        print(f"'Home' navigation covered on {home_removed} pages")
     print(f"Songs without an image: {missing[:30] or 'none'}")
     print(f"Manifest: {args.lyrics_dir / MANIFEST_NAME}")
     print("Next: run verify, then spot-check songs 1, 112, 113, 297, 298, 501, 502, 503.")
@@ -266,6 +291,10 @@ def build_parser() -> argparse.ArgumentParser:
     render_parser.add_argument(
         "--no-crop", action="store_true",
         help="Skip auto-cropping the white margins (keeps the full page)",
+    )
+    render_parser.add_argument(
+        "--keep-home", action="store_true",
+        help="Keep the 'Home' navigation text (by default it is painted over)",
     )
     render_parser.set_defaults(func=render_command)
 
