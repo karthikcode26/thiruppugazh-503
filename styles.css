@@ -250,6 +250,29 @@ html, body {
   line-height: var(--tap);
 }
 
+/* ---- Lyrics ---- */
+.lyrics {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+.lyrics-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.lyrics-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
 /* ---- Audio player ---- */
 .player {
   margin-top: 12px;

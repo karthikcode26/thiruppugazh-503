@@ -84,7 +84,24 @@
             </section>
 
             ${videoContent}
+
+            <section class="lyrics" id="lyrics" hidden>
+              <h2 class="lyrics-title">பாடல் வரிகள் · Lyrics</h2>
+              <div class="lyrics-body" id="lyrics-body"></div>
+            </section>
           `;
+
+          const lyricsSection = document.getElementById("lyrics");
+          const lyricsBody = document.getElementById("lyrics-body");
+          fetch(`lyrics/${song.num}.txt`)
+            .then(response => (response.ok ? response.text() : ""))
+            .then(text => {
+              const trimmed = text.trim();
+              if (!trimmed) return;
+              lyricsBody.textContent = trimmed;
+              lyricsSection.hidden = false;
+            })
+            .catch(() => {});
         })
         .catch(() => {
           detail.innerHTML = '<a class="back" href="index.html">‹ Back</a><p class="empty">Could not load songs.json.</p>';
