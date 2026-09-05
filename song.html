@@ -26,31 +26,59 @@
     </footer>
   </div>
 
-  <script src="app.js"></script>
   <script>
     (function () {
-      const params = new URLSearchParams(location.search);
-      const n = parseInt(params.get("n"), 10);
+      const rawNumber = new URLSearchParams(location.search).get("n") || "";
+      const n = /^\d+$/.test(rawNumber) ? Number(rawNumber) : NaN;
       const detail = document.getElementById("detail");
+      const videoIdPattern = /^[A-Za-z0-9_-]{11}$/;
 
-      function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+      function esc(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[character]);
+      }
 
       fetch("songs.json")
-        .then(r => r.json())
+        .then(response => {
+          if (!response.ok) throw new Error("Could not load songs");
+          return response.json();
+        })
         .then(songs => {
-          const song = songs.find(s => s.num === n);
+          const song = songs.find(item => item.num === n);
           if (!song) {
             detail.innerHTML = '<a class="back" href="index.html">‹ திரும்பு · Back</a><p class="empty">பாடல் கிடைக்கவில்லை · Song not found.</p>';
             document.title = "Not found";
             return;
           }
-          document.title = `${song.num}. ${song.t} | திருப்புகழ்`;
 
-          // Link each song to a YouTube search for that song. This opens the
-          // YouTube app/site (reliable on iPhone), needs no login, and points
-          // to the original creators' videos.
-          const ytQuery = encodeURIComponent(`Thiruppugazh ${song.t} திருப்புகழ்`);
-          const youtubeUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
+          document.title = `${song.num}. ${song.t} | திருப்புகழ்`;
+          const playlistId = "PLFwcC0dtfDTiQSDIfbF9EJYEqTaA4iZ_6";
+          const videoId = typeof song.youtubeId === "string" && videoIdPattern.test(song.youtubeId)
+            ? song.youtubeId
+            : "";
+          const isEmbeddable = !!videoId && song.youtubeEmbeddable === true;
+          const searchQuery = encodeURIComponent(`Thiruppugazh ${song.t} திருப்புகழ்`);
+          const searchUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
+          const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
+          const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : playlistUrl;
+          const videoContent = isEmbeddable
+            ? `<div class="videowrap">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0&playsinline=1"
+                  title="${esc(song.t)} YouTube video"
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+              </div>`
+            : videoId
+              ? `<p class="video-pending">இந்த காணொளியை இங்கே இயக்க அனுமதி இல்லை.<br>Embedding is unavailable; open the exact video on YouTube below.</p>`
+              : `<p class="video-pending">503 பாடல் playlist இன்னும் தளத் தரவுடன் இணைக்கப்படவில்லை.<br>The verified playlist IDs have not been imported yet.</p>`;
+          const buttonLabel = videoId ? "YouTube இல் திற" : "முழு Playlist ஐ திற";
+          const buttonHint = videoId
+            ? "இந்த பாடலின் சரியான காணொளியைத் திறக்கும்"
+            : "503 பாடல்கள் கொண்ட முழு playlist ஐ திறக்கும்";
 
           detail.innerHTML = `
             <a class="back" href="index.html">‹ பட்டியல் · Back to list</a>
@@ -61,11 +89,19 @@
               <div class="oldno">பாடல் எண் ${song.num}</div>
             </section>
 
+            ${videoContent}
+
             <div class="actions">
-              <a class="btn btn-youtube" href="${youtubeUrl}" target="_blank" rel="noopener">
+              <a class="btn btn-youtube" href="${watchUrl}" target="_blank" rel="noopener">
                 <span class="ico">▶</span>
-                <span class="label">YouTube இல் பார்/கேள்
-                  <span class="hint">இந்த பாடலை YouTube இல் தேடும்</span>
+                <span class="label">${buttonLabel}
+                  <span class="hint">${buttonHint}</span>
+                </span>
+              </a>
+              <a class="btn btn-search" href="${searchUrl}" target="_blank" rel="noopener">
+                <span class="ico">⌕</span>
+                <span class="label">வேறு காணொளியைத் தேடு
+                  <span class="hint">இந்த பாடலுக்கான மற்ற YouTube காணொளிகளைத் தேடும்</span>
                 </span>
               </a>
             </div>

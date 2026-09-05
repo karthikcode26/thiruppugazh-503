@@ -1,58 +1,96 @@
 # திருப்புகழ் 503 — Thiruppugazh 503 Songs
 
-A simple, mobile-first website listing all **503 Thiruppugazh songs** of Arunagirinathar.
-Each song links to its lyrics on [kaumaram.com](https://kaumaram.com), a YouTube search,
-and (optionally) an audio player.
+A dependency-free, mobile-first website listing all **503 Thiruppugazh songs**
+of Arunagirinathar. It is designed for an iPhone-sized browser and embeds the
+corresponding video from the complete public YouTube playlist.
 
-## Features (Version 1)
+## Current features
 
-- 📜 All 503 songs, numbered 1–503 (the popular ordering).
-- 🔎 Search by **song number** or by **first word** — in Tamil *or* typed in English.
-- 📖 **Lyrics** link opens the correct page on kaumaram.com.
-- ▶️ **YouTube** link searches for the song.
-- 🎵 **Audio player** appears automatically if an audio file exists at `audio/<number>.mp3`.
-- 📱 Designed to fit an iPhone / phone browser.
+- All 503 songs in the attached master list's 1–503 ordering.
+- Search by song number, Tamil first words, or approximate English transliteration.
+- Responsive exact-ID YouTube player after the one-time playlist import.
+- Safe full-playlist/search links before import, and exact-video/search fallbacks if
+  an imported video cannot be embedded.
+- Static files only: no application server or database is required.
 
-## Files
+## Project files
 
 | File | Purpose |
-|------|---------|
-| `index.html` | The searchable song list (home page). |
-| `song.html`  | A single song's page (lyrics / YouTube / audio). |
-| `app.js`     | Loads data, powers search + transliteration. |
-| `styles.css` | Mobile-first styling. |
-| `songs.json` | The 503-song data (number + Tamil first words + kaumaram catalog number). |
-| `audio/`     | (Optional) Put `1.mp3`, `2.mp3`, … here to enable playback. |
+|---|---|
+| `index.html` | Searchable song list. |
+| `song.html` | Song detail page and responsive YouTube player. |
+| `app.js` | List loading, search, and Tamil-to-Roman search normalization. |
+| `styles.css` | Mobile-first presentation. |
+| `songs.json` | Production song data, including imported YouTube IDs. |
+| `tools/import_youtube_playlist.py` | Imports all 503 playlist videos by position. |
+| `YOUTUBE_PLAYLIST.md` | One-time playlist import instructions. |
+| `deploy.sh` | Safely deploys only public runtime files to the existing S3 bucket. |
+| `tools/extract_links.py` / `links.csv` | Historical Google Drive artifacts; not used by the live site. |
 
 ## Run locally
 
-You need a local web server (opening the file directly will block `fetch`).
+Serve the directory over HTTP because browsers do not allow `fetch()` from a
+plain `file://` page:
 
 ```bash
-# Python (already installed on most machines)
 python3 -m http.server 8000
-# then open http://localhost:8000
 ```
 
-## Data format
+Then open <http://localhost:8000>.
 
-`songs.json` is an array; each entry:
+## Song data
 
 ```json
-{ "num": 16, "t": "அனைவருமருண்டு", "k": 431 }
+{"num":16,"t":"அனைவருமருண்டு","k":431,"v":"legacy-drive-file-id","youtubeId":"dQw4w9WgXcQ","youtubeEmbeddable":true}
 ```
 
-- `num` — the song number shown to users (1–503).
-- `t`   — Tamil first words (title / for search).
-- `k`   — kaumaram catalog number, used to build the lyrics URL
-          `https://kaumaram.com/thiru/nnt<k padded to 4 digits>_u.html`.
+- `num`: public song number, 1–503.
+- `t`: Tamil first words/title.
+- `youtubeId`: exact YouTube ID imported from the matching playlist position.
+- `youtubeEmbeddable`: whether YouTube currently allows that exact video in an iframe.
+- `k`: historical book catalog number; not currently used by the site.
+- `v`: historical Google Drive ID; not currently used by the site.
+
+## Import the complete YouTube playlist
+
+The playlist removes the need for 503 individual searches. See
+**[YOUTUBE_PLAYLIST.md](YOUTUBE_PLAYLIST.md)**. The short version is:
+
+```bash
+# Keep the API key in this Terminal session only
+read -s "YOUTUBE_API_KEY?Paste YouTube API key: "; export YOUTUBE_API_KEY; echo
+
+# Fetch and validate all 503 ordered videos
+python3 tools/import_youtube_playlist.py fetch
+python3 tools/import_youtube_playlist.py inspect
+
+# After confirming playlist position matches song number
+python3 tools/import_youtube_playlist.py apply --confirm-order
+```
+
+The importer creates a versioned, timestamped exact-ID snapshot tied to the
+known playlist. It refuses to apply unless there are exactly 503 unique,
+contiguous positions, then re-fetches the playlist and current video statuses
+at apply time. Every song keeps its exact video ID. A video is embedded only
+when YouTube currently marks it embeddable; otherwise the page offers its exact
+YouTube link and a separate search fallback. The live site never maps songs by
+a mutable playlist position.
+
+Until the networked import is run and its `songs.json` change is reviewed, the
+base dataset intentionally shows the full-playlist and search options instead
+of guessing or embedding an unverified video.
+
+## Deploy to the existing S3 website
+
+The deployment script uploads only the five public runtime assets. It does not
+publish API keys or local playlist reports:
+
+```bash
+bash deploy.sh --dry-run
+bash deploy.sh
+```
 
 ## Roadmap
 
-- Add lyric images from the book.
-- Add real audio files and specific YouTube video links.
-- Favourites, recently viewed, offline support.
-
----
-
-*Lyrics and audio are the property of kaumaram.com; this site only links to their pages.*
+- Add lyric images from the user's book where publication rights allow it.
+- Add favourites, recently viewed songs, and offline support.

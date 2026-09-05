@@ -2,6 +2,18 @@
 .DS_Store
 Thumbs.db
 *.log
+__pycache__/
+*.py[cod]
+
+# Local YouTube reports and review artifacts
+youtube_playlist.csv
+youtube_candidates.csv
+youtube_review.html
+youtube_approvals.csv
+
+# Never commit local environment or credentials
+.env
+.env.*
 
 # Local audio uploads (optional; can be large — host on S3 instead)
 # Uncomment the next line if you don't want audio files in git:
