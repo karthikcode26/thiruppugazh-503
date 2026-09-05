@@ -276,8 +276,6 @@ html, body {
   color: var(--ink);
 }
 .lyrics-imagewrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   border-radius: 10px;
   background: #fffdf8;
   padding: 10px;
@@ -289,21 +287,6 @@ html, body {
   height: auto;
   border-radius: 8px;
   background: #fff;
-  cursor: zoom-in;
-}
-/* Tap to zoom: enlarge and allow horizontal scrolling of the enlarged image */
-.lyrics-imagewrap.zoomed { overflow-x: auto; }
-.lyrics-imagewrap.zoomed .lyrics-image {
-  width: auto;
-  max-width: none;
-  min-width: 175%;
-  cursor: zoom-out;
-}
-.lyrics-hint {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
 }
 
 /* ---- Audio player ---- */
