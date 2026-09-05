@@ -36,9 +36,13 @@ DEFAULT_LYRICS_DIR = ROOT / "lyrics"
 EXPECTED_SONG_COUNT = 503
 MANIFEST_NAME = "manifest.json"
 DEFAULT_DPI = 150
-# The number after the (font-garbled) word "பாடல்". The digits are clean ASCII.
-# It appears near the top of each song page, e.g. "... 1 -- ..." or "... 8 (...)".
-SONG_NUMBER_RE = re.compile(r"(?<!\d)(\d{1,3})(?!\d)")
+# The Tamil word "பாடல்" (song) is rendered by the broken TSCu font as a fixed,
+# consistent byte sequence that PyMuPDF surfaces as these code points:
+#   0xC0 0xA1 0xBC 0xF8  ("À¡¼ø")
+# The real song number is the integer immediately following it. Anchoring on
+# this marker avoids picking up raga/tala/rhythm numbers elsewhere on the page.
+PADAL_MARKER = "\u00c0\u00a1\u00bc\u00f8"
+SONG_NUMBER_RE = re.compile(re.escape(PADAL_MARKER) + r"\s*(\d{1,3})\b")
 
 
 def load_songs(path: Path) -> list[dict[str, Any]]:
@@ -66,26 +70,19 @@ def load_doc(pdf_path: Path):
     return fitz.open(str(pdf_path))
 
 
-def detect_song_number(page_text: str, header_lines: int = 4) -> Optional[int]:
-    """Read the song number from the page header.
+def detect_song_number(page_text: str) -> Optional[int]:
+    """Read the song number that follows the garbled "பாடல்" marker.
 
-    Only the first few lines are considered so a stray number deep in the
-    lyrics cannot be mistaken for the song number. A "Home" navigation line is
-    ignored. The first 1..503 integer found in the header wins.
+    The number is only accepted when it directly follows the fixed marker byte
+    sequence, so raga/tala/rhythm numbers elsewhere on the page are ignored. A
+    page without the marker (front matter, dividers, continuations) returns
+    None.
     """
-    lines = [line.strip() for line in page_text.splitlines() if line.strip()]
-    considered = 0
-    for line in lines:
-        if line.lower() == "home":
-            continue
-        considered += 1
-        if considered > header_lines:
-            break
-        for match in SONG_NUMBER_RE.finditer(line):
-            value = int(match.group(1))
-            if 1 <= value <= EXPECTED_SONG_COUNT:
-                return value
-    return None
+    match = SONG_NUMBER_RE.search(page_text)
+    if not match:
+        return None
+    value = int(match.group(1))
+    return value if 1 <= value <= EXPECTED_SONG_COUNT else None
 
 
 def collect_page_numbers(doc) -> list[Optional[int]]:
