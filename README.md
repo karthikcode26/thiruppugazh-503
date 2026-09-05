@@ -22,7 +22,7 @@ corresponding video from the complete public YouTube playlist.
 | `app.js` | List loading, search, and Tamil-to-Roman search normalization. |
 | `styles.css` | Mobile-first presentation. |
 | `songs.json` | Production song data, including imported YouTube IDs. |
-| `tools/import_youtube_playlist.py` | Imports all 503 playlist videos by position. |
+| `tools/import_youtube_playlist.py` | Maps playlist videos from numeric title prefixes to exact song IDs. |
 | `YOUTUBE_PLAYLIST.md` | One-time playlist import instructions. |
 | `deploy.sh` | Safely deploys only public runtime files to the existing S3 bucket. |
 | `tools/extract_links.py` / `links.csv` | Historical Google Drive artifacts; not used by the live site. |
@@ -46,7 +46,7 @@ Then open <http://localhost:8000>.
 
 - `num`: public song number, 1–503.
 - `t`: Tamil first words/title.
-- `youtubeId`: exact YouTube ID imported from the matching playlist position.
+- `youtubeId`: exact YouTube ID imported from the song number at the start of the video title.
 - `youtubeEmbeddable`: whether YouTube currently allows that exact video in an iframe.
 - `k`: historical book catalog number; not currently used by the site.
 - `v`: historical Google Drive ID; not currently used by the site.
@@ -60,19 +60,24 @@ The playlist removes the need for 503 individual searches. See
 # Keep the API key in this Terminal session only
 read -s "YOUTUBE_API_KEY?Paste YouTube API key: "; export YOUTUBE_API_KEY; echo
 
-# Fetch and validate all 503 ordered videos
+# Fetch and validate every numbered playlist entry
 python3 tools/import_youtube_playlist.py fetch
 python3 tools/import_youtube_playlist.py inspect
 
-# After confirming playlist position matches song number
-python3 tools/import_youtube_playlist.py apply --confirm-order
+# After reviewing the title-number mappings
+python3 tools/import_youtube_playlist.py apply --confirm-mapping
 ```
 
-The importer creates a versioned, timestamped exact-ID snapshot tied to the
-known playlist. It refuses to apply unless there are exactly 503 unique,
-contiguous positions, then re-fetches the playlist and current video statuses
-at apply time. Every song keeps its exact video ID. A video is embedded only
-when YouTube currently marks it embeddable; otherwise the page offers its exact
+The importer creates a versioned, timestamped snapshot tied to the known
+playlist. It maps each video from the number at the beginning of its title—not
+from playlist order—and re-fetches the complete playlist and current video
+statuses at apply time. It safely accepts the observed 501 distinct numbered
+songs, collapses only identical duplicate entries, and ignores only unnumbered
+private/unavailable entries. Songs 158 and 314 currently have no numbered video
+and retain the full-playlist/search fallback.
+
+Every mapped song keeps its exact video ID. A video is embedded only when
+YouTube currently marks it embeddable; otherwise the page offers its exact
 YouTube link and a separate search fallback. The live site never maps songs by
 a mutable playlist position.
 
