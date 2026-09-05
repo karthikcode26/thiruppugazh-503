@@ -1,59 +1,62 @@
 # Lyrics feature — progress & resume notes
 
-_Last updated: 2026-09-05 (session 2). Approach finalized: lyrics as page images._
+_Last updated: 2026-09-05 (session 2). Approach FINALIZED: images via fixed page map._
 
 ## Goal
-Show each song's lyrics **inline, above the YouTube video**, so the user can
-read along while the video plays without leaving the page.
+Show each song's lyrics inline, ABOVE the YouTube video, so the user reads along
+while the video plays without leaving the page.
 
-## PDF facts (confirmed)
-- File: `ThiruppugazhTamil.pdf`, **589 pages**, public domain.
-- One song per page; **extra pages** exist (13 pages of front matter — song 1 is
-  on page 14 / 0-based index 13 — plus section dividers).
-- Fonts: **TSCu_SaiIndira / TSCInaimathi** (legacy TSCII-family). The rendered
-  page looks correct, but the **extractable text is scrambled** (visual-order
-  vowel reordering) and PyMuPDF exposes **no glyph IDs** (`glyph=None`), so
-  clean text cannot be recovered reliably. OCR and hand-reversal both rejected
-  as too risky for scripture.
-- The song **number** prints in a clean numeric header (`பாடல் N` — the Tamil
-  word is garbled but the digit N is clean ASCII), so we map pages by that.
+## Why images (not text)
+The PDF (`ThiruppugazhTamil.pdf`, 589 pages, public domain) uses a legacy TSCu
+font (TSCu_SaiIndira / TSCInaimathi). The extractable text is scrambled, no glyph
+IDs are exposed, and even the printed `பாடல் N` header cannot be trusted from the
+text layer (marker/number mis-extracts on many pages). OCR and font-reversal were
+rejected as too risky for scripture. Rendering pages to images reproduces the
+lyrics exactly as printed.
 
-## Chosen solution: render pages to images
-Render each song's page(s) to `lyrics/<num>.png`; the site shows the image above
-the video. Perfect visual fidelity, no OCR, no font reversal. Tradeoff: image is
-not selectable/searchable and needs pinch-zoom on mobile (fine for read-along).
+## The verified page map (from the user's manual inspection)
+Songs 502 and 503 were placed early; everything else is sequential, one page per
+song, no multi-page songs:
 
-## What is built (branch `lyrics-as-images`, PR #7)
-- `tools/render_lyric_images.py` — `inspect` / `render` / `verify`.
-  - Reads song number from the header window (first ~4 non-"Home" lines).
-  - Groups pages by number; a numberless page attaches as a continuation ONLY
-    if the immediately preceding page was part of the current song.
-  - **Refuses** to render if <450 songs detected or any song maps to
-    **non-consecutive pages** (guards against a divider being misread).
-  - Stacks multi-page songs into one image.
-- `song.html` — lyrics `<img lyrics/<num>.png>` shown ABOVE the video; hides
-  itself if the image 404s.
-- `styles.css` — `.lyrics-image` full-width responsive style.
-- `deploy.sh` — uploads `lyrics/*.png` (image/png) and still `*.txt`.
-- Tested end-to-end with a fake `fitz`: clean 503-page book renders all 503
-  (song 200 stacked); a book with a stray-number divider is correctly refused.
+    PDF pages 14-125  -> songs 1-112
+    PDF page  126     -> song 502
+    PDF pages 127-311 -> songs 113-297
+    PDF page  312     -> song 503
+    PDF pages 313-516 -> songs 298-501
 
-## User's next steps (on the Mac with the PDF)
-1. Merge PR #7.
-2. `git switch main && git pull`
-3. `python3 -m pip install --user pymupdf`
-4. `python3 tools/render_lyric_images.py inspect --pdf "ThiruppugazhTamil.pdf"`
-   - Expect: ~503 songs detected, **no non-consecutive songs**.
-   - Paste the output here before rendering.
-5. If clean: `render`, then `verify`, open a few PNGs, then:
-   `git switch -c add-lyrics-images && git add lyrics && commit && push`, open a
-   data PR, merge, deploy, and check on iPhone (lyrics image sits above video).
+Anchors confirmed by the user: p14=1, p125=112, p126=502, p127=113, p311=297,
+p312=503, p313=298, p516=501. Arithmetic checks out to exactly 503 unique songs.
+This lives in `PAGE_MAP_RANGES` at the top of tools/render_lyric_images.py.
 
-## Fallback if inspect shows problems
-- If some pages don't yield a number (header rule needs tuning), share those
-  pages' first lines and tighten `detect_song_number`.
-- `--dpi` (default 150) trades sharpness vs. size; expect tens of MB total.
+## What is built
+- `tools/render_lyric_images.py` — commands `check` / `render` / `verify`.
+  - `check`: validates the map (503 unique songs, within PDF page count) and
+    prints sample song->page pairs for spot-checking.
+  - `render`: renders each mapped page to `lyrics/<num>.png` + manifest.
+  - `verify`: confirms 503 images and reports total size.
+  - No dependence on the broken text layer.
+- `song.html` / `styles.css` / `deploy.sh` (already merged via PR #7): lyrics
+  image shown ABOVE the video; `lyrics/*.png` uploaded on deploy; hides if 404.
+- Fully tested with a mock fitz: 503 images, correct anchors, short-PDF refused.
+
+## Current PR
+- Branch `lyrics-page-map`, PR #9 (page-map renderer + README/progress).
+  (PR #7 = image display; PR #8 = earlier marker attempt, now superseded by the
+  page map.)
+
+## User's next steps (on the Mac)
+1. Merge PR #9, then `git switch main && git pull`.
+2. `python3 -m pip install --user pymupdf`  (if not already)
+3. `python3 tools/render_lyric_images.py check --pdf "ThiruppugazhTamil.pdf"`
+   - Open the printed sample pages in a viewer; confirm songs 1,112,113,297,
+     298,501,502,503 look right.
+4. `render`, then `verify`, then spot-check several images.
+5. If any page is off, edit `PAGE_MAP_RANGES` and re-render (no other changes).
+6. `git switch -c add-lyrics-images && git add lyrics && commit && push`, open a
+   data PR, merge, `bash deploy.sh --dry-run && bash deploy.sh`.
+7. On iPhone: lyrics image appears above the video on each song page.
+   Expect ~tens of MB total; lower `--dpi` if you want smaller files.
 
 ## Everything else is DONE and live
-- 503-song mobile site on S3; 501 embedded videos; 158 & 314 on fallback.
+- 503-song mobile site on S3; 501 embedded videos; songs 158 & 314 on fallback.
 - Related-videos search and "Open on YouTube" button removed.

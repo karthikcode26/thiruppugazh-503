@@ -90,30 +90,40 @@ of guessing or embedding an unverified video.
 
 ## Add lyrics as page images (recommended for this book)
 
-This book's PDF uses a legacy TSCu Tamil font whose extractable text is
-scrambled, so selectable-text extraction is unreliable. Rendering each song's
-page to an image captures the lyrics exactly as printed. Each page's song number
-is printed in a clean numeric header (`பாடல் N`), which the tool reads to name
-each image `lyrics/<N>.png`. Run on the machine with the PDF:
+This book's PDF uses a legacy TSCu Tamil font whose extractable text (and even
+the printed song numbers) cannot be read reliably from the text layer. Rendering
+each song's page to an image captures the lyrics exactly as printed. Because the
+text layer is unreliable, the tool uses an explicit, human-verified page map
+(songs 502 and 503 appear early; the rest run in sequence) defined in
+`PAGE_MAP_RANGES` at the top of `tools/render_lyric_images.py`:
+
+```
+PDF pages 14-125  -> songs 1-112
+PDF page  126     -> song 502
+PDF pages 127-311 -> songs 113-297
+PDF page  312     -> song 503
+PDF pages 313-516 -> songs 298-501
+```
+
+Run on the machine with the PDF:
 
 ```bash
 python3 -m pip install --user pymupdf
 
-# 1. Confirm detected song pages (must show ~503 and no non-consecutive songs)
-python3 tools/render_lyric_images.py inspect --pdf "ThiruppugazhTamil.pdf"
+# 1. Validate the map and print sample song -> page pairs to spot-check
+python3 tools/render_lyric_images.py check --pdf "ThiruppugazhTamil.pdf"
 
 # 2. Render one image per song
 python3 tools/render_lyric_images.py render --pdf "ThiruppugazhTamil.pdf"
 
-# 3. Check the result, then open a few images by hand
+# 3. Confirm all 503 images exist, then spot-check several against the book
 python3 tools/render_lyric_images.py verify
 ```
 
-`render` refuses to run if too few songs are detected or if any song maps to
-non-consecutive pages (a sign an extra page was misread), so a bad mapping is
-caught before publishing. The song page shows `lyrics/<num>.png` above the video
-so you can read along while it plays. Only publish content you have the right to
-republish; Arunagirinathar's verses are public domain.
+If a spot-check ever shows a page is off, edit only `PAGE_MAP_RANGES` and
+re-render. The song page shows `lyrics/<num>.png` above the video so you can read
+along while it plays. Only publish content you have the right to republish;
+Arunagirinathar's verses are public domain.
 
 ## Add lyrics from a public-domain PDF (text extraction)
 
