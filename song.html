@@ -59,7 +59,7 @@
             : "";
           const isEmbeddable = !!videoId && song.youtubeEmbeddable === true;
           const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
-          const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : playlistUrl;
+          const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
           const videoContent = isEmbeddable
             ? `<div class="videowrap">
                 <iframe
@@ -71,12 +71,8 @@
                   allowfullscreen></iframe>
               </div>`
             : videoId
-              ? `<p class="video-pending">இந்த காணொளியை இங்கே இயக்க அனுமதி இல்லை.<br>Embedding is unavailable; open the exact video on YouTube below.</p>`
-              : `<p class="video-pending">இந்த பாடலுக்கான காணொளி playlist இல் இன்னும் இல்லை.<br>This song's video is not in the playlist yet. Open the full playlist below.</p>`;
-          const buttonLabel = videoId ? "YouTube இல் திற" : "முழு Playlist ஐ திற";
-          const buttonHint = videoId
-            ? "இந்த பாடலின் சரியான காணொளியைத் திறக்கும்"
-            : "503 பாடல்கள் கொண்ட முழு playlist ஐ திறக்கும்";
+              ? `<p class="video-pending">இந்த காணொளியை இங்கே இயக்க அனுமதி இல்லை.<br><a href="${watchUrl}" target="_blank" rel="noopener">YouTube இல் இந்த காணொளியைத் திற · Open this video on YouTube</a></p>`
+              : `<p class="video-pending">இந்த பாடலுக்கான காணொளி playlist இல் இன்னும் இல்லை.<br><a href="${playlistUrl}" target="_blank" rel="noopener">முழு playlist ஐ திற · Open the full playlist</a></p>`;
 
           detail.innerHTML = `
             <a class="back" href="index.html">‹ பட்டியல் · Back to list</a>
@@ -88,15 +84,6 @@
             </section>
 
             ${videoContent}
-
-            <div class="actions">
-              <a class="btn btn-youtube" href="${watchUrl}" target="_blank" rel="noopener">
-                <span class="ico">▶</span>
-                <span class="label">${buttonLabel}
-                  <span class="hint">${buttonHint}</span>
-                </span>
-              </a>
-            </div>
           `;
         })
         .catch(() => {
