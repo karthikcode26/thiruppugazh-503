@@ -209,7 +209,6 @@ html, body {
 .btn .hint { font-size: 12px; font-weight: 400; opacity: .85; display: block; }
 .btn-lyrics { background: linear-gradient(135deg,#8e44ad,#6c3483); }
 .btn-youtube { background: linear-gradient(135deg,#e53935,#b71c1c); }
-.btn-search { background: linear-gradient(135deg,#546e7a,#37474f); }
 .btn-audio { background: linear-gradient(135deg,#00897b,#00695c); }
 
 /* ---- Responsive YouTube embed ---- */
