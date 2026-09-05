@@ -24,7 +24,9 @@ corresponding video from the complete public YouTube playlist.
 | `songs.json` | Production song data, including imported YouTube IDs. |
 | `tools/import_youtube_playlist.py` | Maps playlist videos from numeric title prefixes to exact song IDs. |
 | `YOUTUBE_PLAYLIST.md` | One-time playlist import instructions. |
-| `deploy.sh` | Safely deploys only public runtime files to the existing S3 bucket. |
+| `tools/extract_lyrics.py` | Extracts one lyrics file per song from a text-based PDF book. |
+| `lyrics/<num>.txt` | Per-song public-domain lyrics, loaded on demand by the song page. |
+| `deploy.sh` | Safely deploys the public runtime files and `lyrics/*.txt` to the S3 bucket. |
 | `tools/extract_links.py` / `links.csv` | Historical Google Drive artifacts; not used by the live site. |
 
 ## Run locally
@@ -84,6 +86,33 @@ a mutable playlist position.
 Until the networked import is run and its `songs.json` change is reviewed, the
 base dataset intentionally shows the full-playlist and search options instead
 of guessing or embedding an unverified video.
+
+## Add lyrics from a public-domain PDF
+
+The book prints the song number at the top of each song's page and has
+selectable (text-based) content, so lyrics can be extracted without OCR. Pages
+are mapped by that printed number, not by page position, so front matter and
+divider pages are skipped automatically. Run this on the machine with the PDF:
+
+```bash
+python3 -m pip install --user pdfplumber
+
+# 1. Show the page count and the song number detected on each page
+python3 tools/extract_lyrics.py inspect --pdf "Thiruppugazh.pdf"
+
+# 2. Extract one file per detected song number (no page offset needed)
+python3 tools/extract_lyrics.py extract --pdf "Thiruppugazh.pdf"
+
+# 3. Check the result, then review a few files by hand
+python3 tools/extract_lyrics.py verify
+```
+
+`extract` groups pages by the song number they declare; a song that spans
+several pages is joined in page order, and pages with no valid number are
+skipped. It refuses to run if too few distinct songs are detected, so a bad PDF
+cannot silently produce garbage. Lyrics are written to `lyrics/<num>.txt` and
+displayed on demand by the song page. Only publish lyrics you have the right to
+republish; Arunagirinathar's original verses are public domain.
 
 ## Deploy to the existing S3 website
 

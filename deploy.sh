@@ -30,8 +30,16 @@ for file in "${PUBLIC_FILES[@]}"; do
   aws s3 cp "$file" "s3://${BUCKET}/${file}" ${DRY_RUN}
 done
 
+# Upload the public-domain lyrics text files, if present. Restricted to the
+# lyrics/ folder and .txt files so nothing else in the tree can leak.
+if [[ -d lyrics ]]; then
+  aws s3 sync lyrics "s3://${BUCKET}/lyrics" \
+    --exclude "*" --include "*.txt" --content-type "text/plain; charset=utf-8" \
+    --delete ${DRY_RUN}
+fi
+
 if [[ -n "$DRY_RUN" ]]; then
-  echo "Dry run complete. Only the five public site files above would be uploaded."
+  echo "Dry run complete. Only the five public site files and lyrics/*.txt above would be uploaded."
 else
   echo "Deployment complete: http://${BUCKET}.s3-website-us-east-1.amazonaws.com"
 fi
