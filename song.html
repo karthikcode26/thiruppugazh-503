@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
   <div class="app">
@@ -26,7 +26,7 @@
     </footer>
   </div>
 
-  <script src="store.js?v=2"></script>
+  <script src="store.js?v=3"></script>
   <script>
     (function () {
       const rawNumber = new URLSearchParams(location.search).get("n") || "";
@@ -83,10 +83,16 @@
               <div class="bignum">${song.num}</div>
               <div class="bigtitle">${esc(song.t)}</div>
               <div class="oldno">பாடல் எண் ${song.num}</div>
-              <button class="fav-toggle" id="fav-toggle" type="button" aria-pressed="false">
-                <span class="fav-ico">☆</span>
-                <span class="fav-label">பிடித்தது · Favourite</span>
-              </button>
+              <div class="card-actions">
+                <button class="fav-toggle" id="fav-toggle" type="button" aria-pressed="false">
+                  <span class="fav-ico">☆</span>
+                  <span class="fav-label">பிடித்தது · Favourite</span>
+                </button>
+                <button class="share-btn" id="share-btn" type="button">
+                  <span class="share-ico">↗</span>
+                  <span class="share-label">பகிர் · Share</span>
+                </button>
+              </div>
             </section>
 
             <section class="lyrics" id="lyrics">
@@ -116,6 +122,26 @@
               paint(store.isFavourite(song.num));
               favToggle.addEventListener("click", () => paint(store.toggleFavourite(song.num)));
             }
+          }
+
+          const shareBtn = document.getElementById("share-btn");
+          if (shareBtn) {
+            const shareUrl = location.href;
+            const shareTitle = `${song.num}. ${song.t}`;
+            const shareText = `திருப்புகழ் பாடல் ${song.num}: ${song.t}\n${shareUrl}`;
+            shareBtn.addEventListener("click", async () => {
+              // Prefer the native share sheet (WhatsApp appears there on phones).
+              if (navigator.share) {
+                try {
+                  await navigator.share({ title: shareTitle, text: `திருப்புகழ் பாடல் ${song.num}: ${song.t}`, url: shareUrl });
+                  return;
+                } catch (err) {
+                  if (err && err.name === "AbortError") return; // user dismissed
+                }
+              }
+              // Fallback: open WhatsApp directly with a prefilled message.
+              window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener");
+            });
           }
         })
         .catch(() => {
