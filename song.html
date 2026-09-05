@@ -26,10 +26,12 @@
     </footer>
   </div>
 
+  <script src="store.js"></script>
   <script>
     (function () {
       const rawNumber = new URLSearchParams(location.search).get("n") || "";
       const n = /^\d+$/.test(rawNumber) ? Number(rawNumber) : NaN;
+      const store = window.TPStore || null;
       const detail = document.getElementById("detail");
       const videoIdPattern = /^[A-Za-z0-9_-]{11}$/;
 
@@ -81,6 +83,10 @@
               <div class="bignum">${song.num}</div>
               <div class="bigtitle">${esc(song.t)}</div>
               <div class="oldno">பாடல் எண் ${song.num}</div>
+              <button class="fav-toggle" id="fav-toggle" type="button" aria-pressed="false">
+                <span class="fav-ico">☆</span>
+                <span class="fav-label">பிடித்தது · Favourite</span>
+              </button>
             </section>
 
             <section class="lyrics" id="lyrics">
@@ -95,6 +101,22 @@
 
             ${videoContent}
           `;
+
+          if (store) {
+            store.addRecent(song.num);
+            const favToggle = document.getElementById("fav-toggle");
+            if (favToggle) {
+              const paint = (on) => {
+                favToggle.classList.toggle("on", on);
+                favToggle.setAttribute("aria-pressed", on ? "true" : "false");
+                favToggle.querySelector(".fav-ico").textContent = on ? "★" : "☆";
+                favToggle.querySelector(".fav-label").textContent =
+                  on ? "பிடித்தது · Favourited" : "பிடித்தது · Favourite";
+              };
+              paint(store.isFavourite(song.num));
+              favToggle.addEventListener("click", () => paint(store.toggleFavourite(song.num)));
+            }
+          }
         })
         .catch(() => {
           detail.innerHTML = '<a class="back" href="index.html">‹ Back</a><p class="empty">Could not load songs.json.</p>';

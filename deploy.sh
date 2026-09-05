@@ -18,6 +18,7 @@ PUBLIC_FILES=(
   index.html
   song.html
   app.js
+  store.js
   styles.css
   songs.json
 )
