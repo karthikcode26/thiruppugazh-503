@@ -162,6 +162,16 @@ function init(data) {
       btn.setAttribute("aria-pressed", nowFav ? "true" : "false");
       renderShelves();
     });
+
+    // iOS Safari restores this page from the back-forward cache without re-running
+    // the script, so the shelves would stay stale after viewing/favouriting a song.
+    // Refresh them whenever the page is shown again or becomes visible, and also
+    // re-sync each row's star state.
+    const refresh = () => { render(filter(searchEl.value)); renderShelves(); };
+    window.addEventListener("pageshow", refresh);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") refresh();
+    });
   }
 }
 
