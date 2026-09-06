@@ -136,11 +136,11 @@ function render(items) {
         <span class="title">${escapeHtml(s.t)}</span>
         <span class="chev">›</span>
       </a>
+      ${playBtn}
       <button class="fav-btn${fav ? " on" : ""}" type="button"
               data-num="${s.num}"
               aria-pressed="${fav ? "true" : "false"}"
               aria-label="Toggle favourite for song ${s.num}">${fav ? "★" : "☆"}</button>
-      ${playBtn}
     </li>`;
   }).join("");
   listEl.innerHTML = html;
