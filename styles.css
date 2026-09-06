@@ -8,6 +8,8 @@
   --accent: #c0392b;      /* kumkum red */
   --accent-dark: #96271b;
   --gold: #d99a2b;
+  --teal: #00897b;        /* audio / media accent */
+  --teal-dark: #00695c;
   --border: #ecdfce;
   --shadow: 0 1px 3px rgba(0,0,0,.08);
   --radius: 14px;
@@ -191,13 +193,14 @@ html, body {
   height: 44px;
   border: none;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--teal);
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1;
   cursor: pointer;
+  box-shadow: var(--shadow);
 }
-.play-btn.on { background: var(--accent-dark); }
+.play-btn.on { background: var(--teal-dark); }
 .play-btn:active { transform: scale(.92); }
 
 /* ---- Song-page audio sections ---- */
