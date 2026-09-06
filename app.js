@@ -131,7 +131,6 @@ function render(items) {
               aria-label="${playing ? "Pause" : "Play"} audio for song ${s.num}">${playing ? "⏸" : "▶"}</button>` : "";
     return `
     <li class="song-row">
-      ${playBtn}
       <a class="song" href="song.html?n=${s.num}">
         <span class="num">${s.num}</span>
         <span class="title">${escapeHtml(s.t)}</span>
@@ -141,6 +140,7 @@ function render(items) {
               data-num="${s.num}"
               aria-pressed="${fav ? "true" : "false"}"
               aria-label="Toggle favourite for song ${s.num}">${fav ? "★" : "☆"}</button>
+      ${playBtn}
     </li>`;
   }).join("");
   listEl.innerHTML = html;
