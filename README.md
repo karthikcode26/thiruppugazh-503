@@ -161,6 +161,13 @@ cannot silently produce garbage. Lyrics are written to `lyrics/<num>.txt` and
 displayed on demand by the song page. Only publish lyrics you have the right to
 republish; Arunagirinathar's original verses are public domain.
 
+## Live site
+
+- Public URL: <https://thiruppugazh503.com> (HTTPS via CloudFront; also `www.`).
+- CloudFront distribution `E3LJUZHEDHG497` caches the files globally (fast in
+  India) in front of the S3 bucket. `deploy.sh` invalidates this cache on each
+  deploy so updates appear right away.
+
 ## Cache busting
 
 `index.html` and `song.html` load `styles.css`, `store.js`, and `app.js` with a
