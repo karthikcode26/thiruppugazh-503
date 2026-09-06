@@ -5,8 +5,8 @@ BUCKET="thiruppugazh-503-us-east-1-first-site"
 # Once the CloudFront distribution exists, set its ID here (or export
 # CLOUDFRONT_DISTRIBUTION_ID before running) so each deploy clears the CDN cache
 # and changes appear immediately. Leave empty until CloudFront is set up.
-CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID:-}"
-SITE_URL="${SITE_URL:-http://${BUCKET}.s3-website-us-east-1.amazonaws.com}"
+CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID:-E3LJUZHEDHG497}"
+SITE_URL="${SITE_URL:-https://thiruppugazh503.com}"
 DRY_RUN=""
 
 if [[ "${1:-}" == "--dry-run" ]]; then
