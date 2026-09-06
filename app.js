@@ -67,11 +67,53 @@ function translit(tamil) {
 }
 
 let SONGS = [];
+let AUDIO = {};                 // audio.json manifest (song number -> { main, extra })
 
 const listEl = document.getElementById("list");
 const searchEl = document.getElementById("search");
 const countEl = document.getElementById("count");
 const store = window.TPStore || null;
+
+// One shared audio element so only one song plays at a time.
+const player = new Audio();
+let playingNum = null;
+
+function mainSrcFor(num) {
+  const info = window.TPAudio ? window.TPAudio.forSong(AUDIO, num) : null;
+  return info && info.main ? info.main.src : "";
+}
+
+function stopAudio() {
+  player.pause();
+  const prev = playingNum;
+  playingNum = null;
+  if (prev != null) paintPlayBtn(prev, false);
+}
+
+function toggleAudio(num) {
+  const src = mainSrcFor(num);
+  if (!src) return;
+  if (playingNum === num && !player.paused) {
+    stopAudio();
+    return;
+  }
+  if (playingNum !== num) {
+    stopAudio();
+    player.src = src;
+    playingNum = num;
+  }
+  player.play().then(() => paintPlayBtn(num, true)).catch(() => paintPlayBtn(num, false));
+}
+
+function paintPlayBtn(num, playing) {
+  const btn = listEl.querySelector(`.play-btn[data-num="${num}"]`);
+  if (!btn) return;
+  btn.classList.toggle("on", playing);
+  btn.textContent = playing ? "⏸" : "▶";
+  btn.setAttribute("aria-label", (playing ? "Pause" : "Play") + ` audio for song ${num}`);
+}
+
+player.addEventListener("ended", () => { const n = playingNum; playingNum = null; if (n != null) paintPlayBtn(n, false); });
 
 function render(items) {
   if (!items.length) {
@@ -81,8 +123,15 @@ function render(items) {
   }
   const html = items.map((s) => {
     const fav = store && store.isFavourite(s.num);
+    const hasAudio = !!mainSrcFor(s.num);
+    const playing = hasAudio && playingNum === s.num && !player.paused;
+    const playBtn = hasAudio ? `
+      <button class="play-btn${playing ? " on" : ""}" type="button"
+              data-num="${s.num}"
+              aria-label="${playing ? "Pause" : "Play"} audio for song ${s.num}">${playing ? "⏸" : "▶"}</button>` : "";
     return `
     <li class="song-row">
+      ${playBtn}
       <a class="song" href="song.html?n=${s.num}">
         <span class="num">${s.num}</span>
         <span class="title">${escapeHtml(s.t)}</span>
@@ -148,7 +197,19 @@ function init(data) {
   SONGS = data.map((s) => ({ ...s, _roman: translit(s.t) }));
   render(SONGS);
   renderShelves();
+  // Load the audio manifest, then re-render so rows with audio get a play button.
+  if (window.TPAudio) {
+    window.TPAudio.load().then((m) => { AUDIO = m || {}; render(filter(searchEl.value)); });
+  }
   searchEl.addEventListener("input", () => render(filter(searchEl.value)));
+
+  // Play button (event delegation so it works after re-render).
+  listEl.addEventListener("click", (e) => {
+    const play = e.target.closest(".play-btn");
+    if (!play) return;
+    e.preventDefault();
+    toggleAudio(Number(play.dataset.num));
+  });
 
   // Favourite toggle (event delegation so it works after re-render).
   if (store) {

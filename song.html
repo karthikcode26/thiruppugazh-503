@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <div class="app">
@@ -26,7 +26,8 @@
     </footer>
   </div>
 
-  <script src="store.js?v=3"></script>
+  <script src="store.js?v=4"></script>
+  <script src="audio.js?v=4"></script>
   <script>
     (function () {
       const rawNumber = new URLSearchParams(location.search).get("n") || "";
@@ -95,6 +96,11 @@
               </div>
             </section>
 
+            <section class="audio-main" id="audio-main" hidden>
+              <h2 class="section-title">🎵 பாடல் · Audio</h2>
+              <div id="audio-main-player"></div>
+            </section>
+
             <section class="lyrics" id="lyrics">
               <h2 class="lyrics-title">பாடல் வரிகள் · Lyrics</h2>
               <div class="lyrics-imagewrap">
@@ -106,6 +112,11 @@
             </section>
 
             ${videoContent}
+
+            <section class="extras" id="extras" hidden>
+              <h2 class="section-title">மற்ற பதிவுகள் · Other recordings</h2>
+              <div id="extras-list"></div>
+            </section>
           `;
 
           if (store) {
@@ -141,6 +152,59 @@
               }
               // Fallback: open WhatsApp directly with a prefilled message.
               window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener");
+            });
+          }
+
+          // Audio: main singer player + any number of extra recordings
+          // (other singers' audio and/or other authors' videos), from audio.json.
+          if (window.TPAudio) {
+            window.TPAudio.load().then((manifest) => {
+              const info = window.TPAudio.forSong(manifest, song.num);
+
+              if (info.main) {
+                const mainWrap = document.getElementById("audio-main");
+                const audio = document.createElement("audio");
+                audio.controls = true;
+                audio.preload = "none";
+                audio.src = info.main.src;
+                audio.className = "audio-el";
+                document.getElementById("audio-main-player").appendChild(audio);
+                mainWrap.hidden = false;
+              }
+
+              if (info.extra.length) {
+                const list = document.getElementById("extras-list");
+                info.extra.forEach((item) => {
+                  const card = document.createElement("div");
+                  card.className = "extra-item";
+                  const label = document.createElement("div");
+                  label.className = "extra-label";
+                  label.textContent = item.label || (item.type === "video" ? "Video" : "Audio");
+                  card.appendChild(label);
+                  if (item.type === "audio") {
+                    const a = document.createElement("audio");
+                    a.controls = true;
+                    a.preload = "none";
+                    a.src = item.src;
+                    a.className = "audio-el";
+                    card.appendChild(a);
+                  } else {
+                    const wrap = document.createElement("div");
+                    wrap.className = "videowrap";
+                    const f = document.createElement("iframe");
+                    f.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?rel=0&playsinline=1`;
+                    f.title = (item.label || "") + " YouTube video";
+                    f.loading = "lazy";
+                    f.referrerPolicy = "strict-origin-when-cross-origin";
+                    f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+                    f.allowFullscreen = true;
+                    wrap.appendChild(f);
+                    card.appendChild(wrap);
+                  }
+                  list.appendChild(card);
+                });
+                document.getElementById("extras").hidden = false;
+              }
             });
           }
         })
