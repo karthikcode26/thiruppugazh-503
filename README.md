@@ -161,6 +161,43 @@ cannot silently produce garbage. Lyrics are written to `lyrics/<num>.txt` and
 displayed on demand by the song page. Only publish lyrics you have the right to
 republish; Arunagirinathar's original verses are public domain.
 
+## Per-song audio (main singer + other recordings)
+
+Audio is driven by **`audio.json`** (song number → recordings). Each song can have:
+
+- one **`main`** recording (the consistent main singer) — a ▶/⏸ button on the
+  home-page row plays it inline (one song at a time), and it also shows as a mini
+  player on the song page;
+- any number of **`extra`** recordings shown on the song page under "Other
+  recordings" — other singers' audio and/or other authors' YouTube videos,
+  **including several from the same author**.
+
+```json
+{
+  "1": {
+    "main":  { "label": "Main singer", "type": "audio", "src": "audio/main/1.mp3" },
+    "extra": [
+      { "label": "Guru Ramesh — 1", "type": "audio", "src": "audio/ramesh/1a.mp3" },
+      { "label": "Guru Ramesh — 2", "type": "audio", "src": "audio/ramesh/1b.mp3" },
+      { "label": "Class video",      "type": "video", "youtubeId": "XXXXXXXXXXX" }
+    ]
+  }
+}
+```
+
+- **Audio** entries need `type:"audio"` and `src` (an `audio/...mp3` path).
+- **Video** entries need `type:"video"` and an 11-char `youtubeId` (nothing is
+  stored by us; it streams from YouTube).
+- Songs missing from `audio.json`, or without a valid `main`, simply show no
+  audio button — add files/entries whenever you like.
+
+### Where the files live
+
+Put MP3s under `audio/` (organised by singer, e.g. `audio/main/1.mp3`,
+`audio/ramesh/1a.mp3`). These files are **git-ignored** because they can be large;
+upload them straight to S3 — `bash deploy.sh` syncs the local `audio/` folder to
+the bucket. The `audio.json` manifest itself **is** committed.
+
 ## Live site
 
 - Public URL: <https://thiruppugazh503.com> (HTTPS via CloudFront; also `www.`).

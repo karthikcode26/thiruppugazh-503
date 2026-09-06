@@ -24,8 +24,10 @@ PUBLIC_FILES=(
   song.html
   app.js
   store.js
+  audio.js
   styles.css
   songs.json
+  audio.json
 )
 
 for file in "${PUBLIC_FILES[@]}"; do
@@ -46,6 +48,16 @@ if [[ -d lyrics ]]; then
   aws s3 sync lyrics "s3://${BUCKET}/lyrics" \
     --exclude "*" --include "*.png" \
     --content-type "image/png" \
+    ${DRY_RUN}
+fi
+
+# Upload audio files, if present. Restricted to the audio/ folder and .mp3 so
+# nothing else can leak. Large MP3s are typically kept out of Git and uploaded
+# straight to S3; this sync publishes whatever is in the local audio/ folder.
+if [[ -d audio ]]; then
+  aws s3 sync audio "s3://${BUCKET}/audio" \
+    --exclude "*" --include "*.mp3" \
+    --content-type "audio/mpeg" \
     ${DRY_RUN}
 fi
 

@@ -15,6 +15,7 @@ youtube_approvals.csv
 .env
 .env.*
 
-# Local audio uploads (optional; can be large — host on S3 instead)
-# Uncomment the next line if you don't want audio files in git:
-# audio/
+# Audio MP3s can be large (up to ~1-2 GB across 503 songs), so keep them out of
+# Git and upload straight to S3 (deploy.sh syncs the local audio/ folder). The
+# audio.json manifest IS committed; only the media files are ignored.
+audio/
