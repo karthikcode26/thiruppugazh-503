@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <div class="app">
@@ -30,6 +30,8 @@
       <div class="count" id="count"></div>
     </div>
 
+    <nav class="rangebar" id="rangebar" aria-label="Jump to song range"></nav>
+
     <section class="shelf" id="recent-shelf" hidden>
       <h2 class="shelf-title">சமீபத்தில் பார்த்தவை · Recently viewed</h2>
       <div class="chips" id="recent-chips"></div>
@@ -49,8 +51,10 @@
     </footer>
   </div>
 
-  <script src="store.js?v=6"></script>
-  <script src="audio.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <button class="to-top" id="to-top" type="button" hidden aria-label="Back to top">↑</button>
+
+  <script src="store.js?v=7"></script>
+  <script src="audio.js?v=7"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

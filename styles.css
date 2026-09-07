@@ -90,8 +90,52 @@ html, body {
   color: var(--muted);
 }
 
-/* ---- Shelves (recently viewed / favourites) ---- */
+/* ---- Range jump bar ---- */
 [hidden] { display: none !important; }
+.rangebar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 16px 10px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.range-chip {
+  flex: 0 0 auto;
+  border: 1px solid var(--gold);
+  background: #fffdf8;
+  color: var(--accent-dark);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.range-chip:active { transform: scale(.97); }
+
+/* Back-to-top floating button */
+.to-top {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  cursor: pointer;
+  z-index: 20;
+}
+.to-top:active { transform: scale(.94); }
+
+/* ---- Shelves (recently viewed / favourites) ---- */
 .shelf {
   padding: 10px 14px 2px;
 }
