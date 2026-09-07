@@ -94,9 +94,8 @@ html, body {
 [hidden] { display: none !important; }
 .rangebar {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 8px 16px 10px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
