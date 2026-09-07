@@ -104,6 +104,8 @@ function jumpToSong(num) {
 // One shared audio element so only one song plays at a time.
 const player = new Audio();
 let playingNum = null;
+let queue = [];        // playlist of song numbers (favourites that have audio)
+let queueIndex = -1;   // position in the queue; -1 = not in playlist mode
 
 function mainSrcFor(num) {
   const info = window.TPAudio ? window.TPAudio.forSong(AUDIO, num) : null;
@@ -114,9 +116,13 @@ function stopAudio() {
   player.pause();
   const prev = playingNum;
   playingNum = null;
+  queue = [];
+  queueIndex = -1;
   if (prev != null) paintPlayBtn(prev, false);
+  updateNowPlaying();
 }
 
+// Play a single song (from a row button). Leaves/clears any playlist.
 function toggleAudio(num) {
   const src = mainSrcFor(num);
   if (!src) return;
@@ -124,12 +130,54 @@ function toggleAudio(num) {
     stopAudio();
     return;
   }
-  if (playingNum !== num) {
-    stopAudio();
-    player.src = src;
-    playingNum = num;
-  }
+  queue = [];
+  queueIndex = -1;
+  playSong(num);
+}
+
+// Internal: load and play a song number, updating UI.
+function playSong(num) {
+  const src = mainSrcFor(num);
+  if (!src) return;
+  const prev = playingNum;
+  if (prev != null && prev !== num) paintPlayBtn(prev, false);
+  player.src = src;
+  playingNum = num;
   player.play().then(() => paintPlayBtn(num, true)).catch(() => paintPlayBtn(num, false));
+  updateNowPlaying();
+}
+
+// Start a playlist from a list of song numbers (skips those without audio).
+function playQueue(nums) {
+  const playable = nums.filter((n) => !!mainSrcFor(n));
+  if (!playable.length) return false;
+  queue = playable;
+  queueIndex = 0;
+  playSong(queue[0]);
+  return true;
+}
+
+function playNext() {
+  if (queueIndex < 0 || queueIndex + 1 >= queue.length) { stopAudio(); return; }
+  queueIndex += 1;
+  playSong(queue[queueIndex]);
+}
+
+function playPrev() {
+  if (queueIndex <= 0) return;
+  queueIndex -= 1;
+  playSong(queue[queueIndex]);
+}
+
+function togglePausePlay() {
+  if (playingNum == null) return;
+  if (player.paused) {
+    player.play().then(() => { paintPlayBtn(playingNum, true); updateNowPlaying(); });
+  } else {
+    player.pause();
+    paintPlayBtn(playingNum, false);
+    updateNowPlaying();
+  }
 }
 
 function paintPlayBtn(num, playing) {
@@ -140,7 +188,33 @@ function paintPlayBtn(num, playing) {
   btn.setAttribute("aria-label", (playing ? "Pause" : "Play") + ` audio for song ${num}`);
 }
 
-player.addEventListener("ended", () => { const n = playingNum; playingNum = null; if (n != null) paintPlayBtn(n, false); });
+// When a track ends: advance the playlist, or clear single-play state.
+player.addEventListener("ended", () => {
+  const n = playingNum;
+  if (n != null) paintPlayBtn(n, false);
+  if (queueIndex >= 0) {
+    playNext();
+  } else {
+    playingNum = null;
+    updateNowPlaying();
+  }
+});
+
+// ---- Now-playing bar ----
+function updateNowPlaying() {
+  const bar = document.getElementById("nowplaying");
+  if (!bar) return;
+  if (playingNum == null) { bar.hidden = true; return; }
+  const song = songByNum(playingNum);
+  const title = song ? `${song.num}. ${song.t}` : `Song ${playingNum}`;
+  const inQueue = queueIndex >= 0;
+  bar.querySelector(".np-title").textContent = title;
+  bar.querySelector(".np-pos").textContent = inQueue ? `${queueIndex + 1} / ${queue.length}` : "";
+  bar.querySelector(".np-play").textContent = player.paused ? "▶" : "⏸";
+  bar.querySelector(".np-prev").hidden = !inQueue;
+  bar.querySelector(".np-next").hidden = !inQueue;
+  bar.hidden = false;
+}
 
 function render(items) {
   if (!items.length) {
@@ -200,6 +274,12 @@ function renderShelves() {
   if (!store) return;
   renderShelf("recent-shelf", "recent-chips", store.getRecent());
   renderShelf("fav-shelf", "fav-chips", store.getFavourites());
+  // Show "Play favourites" only if at least one favourite has audio.
+  const playFav = document.getElementById("playfav-btn");
+  if (playFav) {
+    const anyAudio = store.getFavourites().some((n) => !!mainSrcFor(n));
+    playFav.hidden = !anyAudio;
+  }
 }
 
 function escapeHtml(str) {
@@ -248,6 +328,23 @@ function init(data) {
       if (!chip) return;
       jumpToSong(Number(chip.dataset.jump));
     });
+  }
+
+  // Play favourites (auto-advance through favourited songs that have audio).
+  const playFavBtn = document.getElementById("playfav-btn");
+  if (playFavBtn && store) {
+    playFavBtn.addEventListener("click", () => {
+      playQueue(store.getFavourites());
+    });
+  }
+
+  // Now-playing bar controls.
+  const np = document.getElementById("nowplaying");
+  if (np) {
+    np.querySelector(".np-prev").addEventListener("click", playPrev);
+    np.querySelector(".np-next").addEventListener("click", playNext);
+    np.querySelector(".np-play").addEventListener("click", togglePausePlay);
+    np.querySelector(".np-stop").addEventListener("click", stopAudio);
   }
 
   // Back-to-top button: show after scrolling down a bit.
