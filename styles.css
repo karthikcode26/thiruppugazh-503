@@ -1,16 +1,16 @@
 /* ===== Thiruppugazh 503 — mobile-first styles ===== */
 
 :root {
-  --bg: #fff8ec;          /* warm saffron-tinted paper */
+  --bg: #fdf6ec;
   --card: #ffffff;
   --ink: #2b2018;
-  --muted: #8a7355;
-  --accent: #e8791a;      /* saffron / Murugan orange */
-  --accent-dark: #c25e00;
+  --muted: #7a6a58;
+  --accent: #c0392b;      /* kumkum red */
+  --accent-dark: #96271b;
   --gold: #d99a2b;
   --teal: #00897b;        /* audio / media accent */
   --teal-dark: #00695c;
-  --border: #f0e2c9;
+  --border: #ecdfce;
   --shadow: 0 1px 3px rgba(0,0,0,.08);
   --radius: 14px;
   --tap: 48px;            /* minimum touch target */
