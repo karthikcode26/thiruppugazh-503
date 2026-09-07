@@ -144,6 +144,75 @@ html, body {
   font-weight: 700;
   color: var(--accent-dark);
 }
+.shelf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.shelf-head .shelf-title { margin: 0; }
+.playfav-btn {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 999px;
+  background: var(--teal);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.playfav-btn:active { transform: scale(.97); }
+
+/* Now-playing bar (fixed at the bottom) */
+.nowplaying {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  background: var(--accent-dark);
+  color: #fff;
+  box-shadow: 0 -2px 10px rgba(0,0,0,.25);
+}
+.np-btn {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.np-play { background: var(--teal); }
+.np-btn:active { transform: scale(.92); }
+.np-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.np-title {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.np-pos { font-size: 11px; opacity: .8; }
 .chips {
   display: flex;
   gap: 8px;
@@ -191,7 +260,8 @@ html, body {
 .list {
   list-style: none;
   margin: 0;
-  padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
+  /* extra bottom space so the fixed now-playing bar never covers the last rows */
+  padding: 8px 12px calc(96px + env(safe-area-inset-bottom));
   flex: 1;
 }
 .song-row {

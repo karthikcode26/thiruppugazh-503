@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=13" />
 </head>
 <body>
   <div class="app">
@@ -40,9 +40,23 @@
     </section>
 
     <section class="shelf" id="fav-shelf" hidden>
-      <h2 class="shelf-title">பிடித்தவை · Favourites</h2>
+      <div class="shelf-head">
+        <h2 class="shelf-title">பிடித்தவை · Favourites</h2>
+        <button class="playfav-btn" id="playfav-btn" type="button" hidden>▶ Play favourites</button>
+      </div>
       <div class="chips" id="fav-chips"></div>
     </section>
+
+    <div class="nowplaying" id="nowplaying" hidden>
+      <button class="np-btn np-prev" type="button" aria-label="Previous">⏮</button>
+      <button class="np-btn np-play" type="button" aria-label="Play or pause">⏸</button>
+      <button class="np-btn np-next" type="button" aria-label="Next">⏭</button>
+      <div class="np-info">
+        <span class="np-title"></span>
+        <span class="np-pos"></span>
+      </div>
+      <button class="np-btn np-stop" type="button" aria-label="Stop">✕</button>
+    </div>
 
     <ul class="list" id="list">
       <li class="loading">ஏற்றுகிறது… Loading songs…</li>
@@ -55,8 +69,8 @@
 
   <button class="to-top" id="to-top" type="button" hidden aria-label="Back to top">↑</button>
 
-  <script src="store.js?v=12"></script>
-  <script src="audio.js?v=12"></script>
-  <script src="app.js?v=12"></script>
+  <script src="store.js?v=13"></script>
+  <script src="audio.js?v=13"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
