@@ -84,7 +84,9 @@ function buildRangeBar() {
   let html = "";
   for (let start = 1; start <= total; start += RANGE_SIZE) {
     const end = Math.min(start + RANGE_SIZE - 1, total);
-    html += `<button class="range-chip" type="button" data-jump="${start}">${start}–${end}</button>`;
+    const isLast = start + RANGE_SIZE > total;
+    const label = isLast ? `${start}+` : `${start}–${end}`;
+    html += `<button class="range-chip" type="button" data-jump="${start}">${label}</button>`;
   }
   rangeEl.innerHTML = html;
 }
