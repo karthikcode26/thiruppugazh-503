@@ -342,9 +342,14 @@ function init(data) {
   renderShelves();
   buildRangeBar();
   updateRangeBarVisibility();
-  // Load the audio manifest, then re-render so rows with audio get a play button.
+  // Load the audio manifest, then re-render so rows get play buttons AND the
+  // shelves refresh (so "Play favourites" appears once audio data is known).
   if (window.TPAudio) {
-    window.TPAudio.load().then((m) => { AUDIO = m || {}; render(filter(searchEl.value)); });
+    window.TPAudio.load().then((m) => {
+      AUDIO = m || {};
+      render(filter(searchEl.value));
+      renderShelves();
+    });
   }
   searchEl.addEventListener("input", () => {
     render(filter(searchEl.value));
