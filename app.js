@@ -75,7 +75,7 @@ const countEl = document.getElementById("count");
 const rangeEl = document.getElementById("rangebar");
 const toTopEl = document.getElementById("to-top");
 const store = window.TPStore || null;
-const RANGE_SIZE = 50;
+const RANGE_SIZE = 100;
 
 // Build the range jump chips (1-50, 51-100, ... up to the number of songs).
 function buildRangeBar() {

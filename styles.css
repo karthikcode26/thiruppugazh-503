@@ -106,9 +106,9 @@ html, body {
   background: #fffdf8;
   color: var(--accent-dark);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 8px 14px;
+  padding: 7px 12px;
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
