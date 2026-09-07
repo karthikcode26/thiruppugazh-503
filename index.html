@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=13" />
+  <link rel="stylesheet" href="styles.css?v=14" />
 </head>
 <body>
   <div class="app">
@@ -48,14 +48,21 @@
     </section>
 
     <div class="nowplaying" id="nowplaying" hidden>
-      <button class="np-btn np-prev" type="button" aria-label="Previous">⏮</button>
-      <button class="np-btn np-play" type="button" aria-label="Play or pause">⏸</button>
-      <button class="np-btn np-next" type="button" aria-label="Next">⏭</button>
-      <div class="np-info">
-        <span class="np-title"></span>
-        <span class="np-pos"></span>
+      <div class="np-row">
+        <button class="np-btn np-prev" type="button" aria-label="Previous">⏮</button>
+        <button class="np-btn np-play" type="button" aria-label="Play or pause">⏸</button>
+        <button class="np-btn np-next" type="button" aria-label="Next">⏭</button>
+        <div class="np-info">
+          <span class="np-title"></span>
+          <span class="np-pos"></span>
+        </div>
+        <button class="np-btn np-stop" type="button" aria-label="Stop">✕</button>
       </div>
-      <button class="np-btn np-stop" type="button" aria-label="Stop">✕</button>
+      <div class="np-seekrow">
+        <span class="np-cur">0:00</span>
+        <input class="np-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" />
+        <span class="np-dur">0:00</span>
+      </div>
     </div>
 
     <ul class="list" id="list">
@@ -69,8 +76,8 @@
 
   <button class="to-top" id="to-top" type="button" hidden aria-label="Back to top">↑</button>
 
-  <script src="store.js?v=13"></script>
-  <script src="audio.js?v=13"></script>
-  <script src="app.js?v=13"></script>
+  <script src="store.js?v=14"></script>
+  <script src="audio.js?v=14"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
