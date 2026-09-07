@@ -72,7 +72,35 @@ let AUDIO = {};                 // audio.json manifest (song number -> { main, e
 const listEl = document.getElementById("list");
 const searchEl = document.getElementById("search");
 const countEl = document.getElementById("count");
+const rangeEl = document.getElementById("rangebar");
+const toTopEl = document.getElementById("to-top");
 const store = window.TPStore || null;
+const RANGE_SIZE = 50;
+
+// Build the range jump chips (1-50, 51-100, ... up to the number of songs).
+function buildRangeBar() {
+  if (!rangeEl || !SONGS.length) return;
+  const total = SONGS.length;
+  let html = "";
+  for (let start = 1; start <= total; start += RANGE_SIZE) {
+    const end = Math.min(start + RANGE_SIZE - 1, total);
+    html += `<button class="range-chip" type="button" data-jump="${start}">${start}–${end}</button>`;
+  }
+  rangeEl.innerHTML = html;
+}
+
+// Smooth-scroll so a given song row sits just below the sticky search/range bars.
+function jumpToSong(num) {
+  const row = listEl.querySelector(`.song-row[data-num="${num}"]`);
+  if (!row) return;
+  const header = document.querySelector(".header");
+  const search = document.querySelector(".searchbar");
+  const offset = (header ? header.offsetHeight : 0)
+    + (search ? search.offsetHeight : 0)
+    + (rangeEl ? rangeEl.offsetHeight : 0) + 8;
+  const y = row.getBoundingClientRect().top + window.pageYOffset - offset;
+  window.scrollTo({ top: Math.max(y, 0), behavior: "smooth" });
+}
 
 // One shared audio element so only one song plays at a time.
 const player = new Audio();
@@ -130,7 +158,7 @@ function render(items) {
               data-num="${s.num}"
               aria-label="${playing ? "Pause" : "Play"} audio for song ${s.num}">${playing ? "⏸" : "▶"}</button>` : "";
     return `
-    <li class="song-row">
+    <li class="song-row" data-num="${s.num}">
       <a class="song" href="song.html?n=${s.num}">
         <span class="num">${s.num}</span>
         <span class="title">${escapeHtml(s.t)}</span>
@@ -193,15 +221,43 @@ function filter(q) {
   });
 }
 
+// Hide the range bar while searching/filtering (it only makes sense for the full list).
+function updateRangeBarVisibility() {
+  if (!rangeEl) return;
+  rangeEl.hidden = searchEl.value.trim().length > 0;
+}
+
 function init(data) {
   SONGS = data.map((s) => ({ ...s, _roman: translit(s.t) }));
   render(SONGS);
   renderShelves();
+  buildRangeBar();
+  updateRangeBarVisibility();
   // Load the audio manifest, then re-render so rows with audio get a play button.
   if (window.TPAudio) {
     window.TPAudio.load().then((m) => { AUDIO = m || {}; render(filter(searchEl.value)); });
   }
-  searchEl.addEventListener("input", () => render(filter(searchEl.value)));
+  searchEl.addEventListener("input", () => {
+    render(filter(searchEl.value));
+    updateRangeBarVisibility();
+  });
+
+  // Range jump chips.
+  if (rangeEl) {
+    rangeEl.addEventListener("click", (e) => {
+      const chip = e.target.closest(".range-chip");
+      if (!chip) return;
+      jumpToSong(Number(chip.dataset.jump));
+    });
+  }
+
+  // Back-to-top button: show after scrolling down a bit.
+  if (toTopEl) {
+    const onScroll = () => { toTopEl.hidden = window.pageYOffset < 400; };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    toTopEl.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    onScroll();
+  }
 
   // Play button (event delegation so it works after re-render).
   listEl.addEventListener("click", (e) => {
