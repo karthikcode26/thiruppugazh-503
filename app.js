@@ -145,6 +145,7 @@ function playSong(num) {
   playingNum = num;
   player.play().then(() => paintPlayBtn(num, true)).catch(() => paintPlayBtn(num, false));
   updateNowPlaying();
+  updateSeek();
 }
 
 // Start a playlist from a list of song numbers (skips those without audio).
@@ -201,6 +202,15 @@ player.addEventListener("ended", () => {
 });
 
 // ---- Now-playing bar ----
+let seeking = false;   // true while the user is dragging the seek slider
+
+function formatTime(sec) {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
 function updateNowPlaying() {
   const bar = document.getElementById("nowplaying");
   if (!bar) return;
@@ -215,6 +225,26 @@ function updateNowPlaying() {
   bar.querySelector(".np-next").hidden = !inQueue;
   bar.hidden = false;
 }
+
+// Refresh the seek slider + time labels from the audio element.
+function updateSeek() {
+  const bar = document.getElementById("nowplaying");
+  if (!bar || bar.hidden) return;
+  const seek = bar.querySelector(".np-seek");
+  const cur = bar.querySelector(".np-cur");
+  const dur = bar.querySelector(".np-dur");
+  const total = player.duration;
+  cur.textContent = formatTime(player.currentTime);
+  dur.textContent = isFinite(total) ? formatTime(total) : "0:00";
+  if (!seeking && isFinite(total) && total > 0) {
+    seek.value = String(Math.round((player.currentTime / total) * 1000));
+  }
+}
+
+// Keep the seek bar in sync as the track plays / loads.
+player.addEventListener("timeupdate", updateSeek);
+player.addEventListener("loadedmetadata", updateSeek);
+player.addEventListener("durationchange", updateSeek);
 
 function render(items) {
   if (!items.length) {
@@ -345,6 +375,27 @@ function init(data) {
     np.querySelector(".np-next").addEventListener("click", playNext);
     np.querySelector(".np-play").addEventListener("click", togglePausePlay);
     np.querySelector(".np-stop").addEventListener("click", stopAudio);
+
+    // Seek slider: drag to scrub through the current track.
+    const seek = np.querySelector(".np-seek");
+    const beginSeek = () => { seeking = true; };
+    const commitSeek = () => {
+      if (isFinite(player.duration) && player.duration > 0) {
+        player.currentTime = (Number(seek.value) / 1000) * player.duration;
+      }
+      seeking = false;
+      updateSeek();
+    };
+    seek.addEventListener("input", () => {
+      seeking = true;
+      const cur = np.querySelector(".np-cur");
+      if (isFinite(player.duration) && player.duration > 0) {
+        cur.textContent = formatTime((Number(seek.value) / 1000) * player.duration);
+      }
+    });
+    seek.addEventListener("mousedown", beginSeek);
+    seek.addEventListener("touchstart", beginSeek, { passive: true });
+    seek.addEventListener("change", commitSeek);
   }
 
   // Back-to-top button: show after scrolling down a bit.
