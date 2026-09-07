@@ -68,6 +68,7 @@ function translit(tamil) {
 
 let SONGS = [];
 let AUDIO = {};                 // audio.json manifest (song number -> { main, extra })
+let AUDIO_READY = false;        // true once audio.json has finished loading
 
 const listEl = document.getElementById("list");
 const searchEl = document.getElementById("search");
@@ -304,9 +305,12 @@ function renderShelves() {
   if (!store) return;
   renderShelf("recent-shelf", "recent-chips", store.getRecent());
   renderShelf("fav-shelf", "fav-chips", store.getFavourites());
-  // Show "Play favourites" only if at least one favourite has audio.
+  // Show "Play favourites" once the audio manifest is loaded and at least one
+  // favourite has audio. Before the manifest loads, don't force-hide it — that
+  // avoids a race where an early render (or pageshow/visibilitychange) would
+  // wrongly hide it while AUDIO is still empty.
   const playFav = document.getElementById("playfav-btn");
-  if (playFav) {
+  if (playFav && AUDIO_READY) {
     const anyAudio = store.getFavourites().some((n) => !!mainSrcFor(n));
     playFav.hidden = !anyAudio;
   }
@@ -342,9 +346,17 @@ function init(data) {
   renderShelves();
   buildRangeBar();
   updateRangeBarVisibility();
-  // Load the audio manifest, then re-render so rows with audio get a play button.
+  // Load the audio manifest, then re-render rows (play buttons) and refresh the
+  // shelves so "Play favourites" is decided once the audio data is known.
   if (window.TPAudio) {
-    window.TPAudio.load().then((m) => { AUDIO = m || {}; render(filter(searchEl.value)); });
+    window.TPAudio.load().then((m) => {
+      AUDIO = m || {};
+      AUDIO_READY = true;
+      render(filter(searchEl.value));
+      renderShelves();
+    });
+  } else {
+    AUDIO_READY = true; // no audio support; shelves can settle immediately
   }
   searchEl.addEventListener("input", () => {
     render(filter(searchEl.value));
