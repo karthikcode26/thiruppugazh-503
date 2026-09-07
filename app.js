@@ -95,11 +95,8 @@ function buildRangeBar() {
 function jumpToSong(num) {
   const row = listEl.querySelector(`.song-row[data-num="${num}"]`);
   if (!row) return;
-  const header = document.querySelector(".header");
-  const search = document.querySelector(".searchbar");
-  const offset = (header ? header.offsetHeight : 0)
-    + (search ? search.offsetHeight : 0)
-    + (rangeEl ? rangeEl.offsetHeight : 0) + 8;
+  const sticky = document.querySelector(".stickytop");
+  const offset = (sticky ? sticky.offsetHeight : 0) + 8;
   const y = row.getBoundingClientRect().top + window.pageYOffset - offset;
   window.scrollTo({ top: Math.max(y, 0), behavior: "smooth" });
 }

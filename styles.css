@@ -42,9 +42,6 @@ html, body {
 
 /* ---- Header ---- */
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   color: #fff;
   padding: 14px 16px calc(14px + env(safe-area-inset-top));
@@ -64,13 +61,16 @@ html, body {
 }
 
 /* ---- Search ---- */
-.searchbar {
+.stickytop {
   position: sticky;
   top: 0;
-  z-index: 9;
+  z-index: 10;
+  background: var(--bg);
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+.searchbar {
   background: var(--bg);
   padding: 12px 16px 8px;
-  border-bottom: 1px solid var(--border);
 }
 .searchbar input {
   width: 100%;
