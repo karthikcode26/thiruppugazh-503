@@ -1,0 +1,14 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DisableAndReadCloudFrontDistribution",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:GetDistributionConfig",
+        "cloudfront:UpdateDistribution"
+      ],
+      "Resource": "arn:aws:cloudfront::825236201472:distribution/E3LJUZHEDHG497"
+    }
+  ]
+}
