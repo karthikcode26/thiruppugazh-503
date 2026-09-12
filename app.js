@@ -423,6 +423,15 @@ function setupVoiceSearch() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return; // unsupported browser: leave the mic hidden
 
+  // iOS Safari/WebKit exposes webkitSpeechRecognition but it does not actually
+  // work (speech recognition is unavailable to web pages on iOS). Detect iOS —
+  // including iPadOS, which reports as "Macintosh" but is touch-capable — and
+  // keep the mic hidden there so users don't see a button that fails.
+  const ua = navigator.userAgent || "";
+  const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+    (/Macintosh/.test(ua) && typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 1);
+  if (isIOS) return; // leave the mic hidden on iOS
+
   micBtn.hidden = false;
   let recognizing = false;
   let recognition = null;
