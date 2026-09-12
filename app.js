@@ -60,10 +60,68 @@ function normalizeRoman(s) {
     .replace(/b/g, "p")
     .replace(/j/g, "s")
     .replace(/w/g, "v")
+    .replace(/c/g, "s")     // c heard as s (e.g. "che"/"se")
+    .replace(/f/g, "p")     // no native f sound; heard as p
+    .replace(/x/g, "s")
+    .replace(/y/g, "i")     // glide y often heard as i
+    .replace(/h/g, "")      // aspiration is inconsistently written/heard
     .replace(/(.)\1+/g, "$1"); // collapse any remaining doubles
 }
 function translit(tamil) {
   return normalizeRoman(translitRaw(tamil));
+}
+
+// ---- Phonetic "sounds-like" search ----
+// Turn any query (Tamil script OR Roman letters) into the same normalized sound
+// key we store per song, so spoken/typed words match by sound, not by spelling.
+function soundKey(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return "";
+  // If it contains Tamil letters, transliterate; otherwise treat as Roman.
+  const hasTamil = /[\u0B80-\u0BFF]/.test(raw);
+  const roman = hasTamil ? translitRaw(raw) : raw.toLowerCase();
+  // strip anything that isn't a-z (spaces/punctuation/diacritics) then fold sounds
+  return normalizeRoman(roman.replace(/[^a-z]/g, ""));
+}
+
+// Levenshtein edit distance (small strings only), for fuzzy tolerance.
+function editDistance(a, b) {
+  if (a === b) return 0;
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  let prev = new Array(n + 1);
+  let curr = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+    }
+    [prev, curr] = [curr, prev];
+  }
+  return prev[n];
+}
+
+// Score a song's sound key against the query sound key. Lower = better match;
+// returns null if it should not match at all. Ranks: exact < prefix < substring
+// < close-by-edit-distance.
+function phoneticScore(songKey, qKey) {
+  if (!qKey) return null;
+  if (songKey === qKey) return 0;
+  if (songKey.startsWith(qKey)) return 1;
+  // For very short queries, only match at the start (prefix) to avoid flooding
+  // results with every song that happens to contain a common sound.
+  if (qKey.length < 3) return null;
+  if (songKey.includes(qKey)) return 2;
+  // fuzzy: allow a small number of edits, scaled to query length
+  const tolerance = qKey.length <= 5 ? 1 : (qKey.length <= 8 ? 2 : 3);
+  // compare against the song key's leading segment of similar length
+  const head = songKey.slice(0, qKey.length + tolerance);
+  const dist = editDistance(qKey, head);
+  if (dist <= tolerance) return 3 + dist;
+  return null;
 }
 
 let SONGS = [];
@@ -323,15 +381,31 @@ function escapeHtml(str) {
 }
 
 function filter(q) {
-  q = q.trim().toLowerCase();
-  if (!q) return SONGS;
-  const isNum = /^\d+$/.test(q);
-  const qn = normalizeRoman(q); // normalized English query
-  return SONGS.filter((s) => {
-    if (isNum) return String(s.num).startsWith(q) || String(s.num) === q;
-    // match Tamil text directly OR its normalized romanized form
-    return s.t.toLowerCase().includes(q) || s._roman.includes(qn);
-  });
+  const raw = String(q || "").trim();
+  if (!raw) return SONGS;
+
+  // Number search stays exact and takes priority.
+  if (/^\d+$/.test(raw)) {
+    return SONGS.filter((s) => String(s.num).startsWith(raw) || String(s.num) === raw);
+  }
+
+  const lower = raw.toLowerCase();
+  const qKey = soundKey(raw);
+
+  // Score every song: direct Tamil/Roman substring wins; otherwise phonetic.
+  const scored = [];
+  for (const s of SONGS) {
+    let score = null;
+    if (s.t.toLowerCase().includes(lower)) score = 0;          // exact Tamil substring
+    else {
+      const ps = phoneticScore(s._key, qKey);                  // sounds-like
+      if (ps !== null) score = ps;
+    }
+    if (score !== null) scored.push({ s, score, num: s.num });
+  }
+  // Best matches first; stable by song number within the same score.
+  scored.sort((a, b) => (a.score - b.score) || (a.num - b.num));
+  return scored.map((x) => x.s);
 }
 
 // Hide the range bar while searching/filtering (it only makes sense for the full list).
@@ -386,7 +460,7 @@ function setupVoiceSearch() {
 }
 
 function init(data) {
-  SONGS = data.map((s) => ({ ...s, _roman: translit(s.t) }));
+  SONGS = data.map((s) => ({ ...s, _roman: translit(s.t), _key: soundKey(s.t) }));
   render(SONGS);
   renderShelves();
   buildRangeBar();
