@@ -340,6 +340,51 @@ function updateRangeBarVisibility() {
   rangeEl.hidden = searchEl.value.trim().length > 0;
 }
 
+// Voice search: fill the search box from spoken words using the browser's
+// Web Speech API. Hidden where unsupported (e.g. iOS Safari). Tamil first,
+// with a graceful result either way — the text just flows into normal search.
+function setupVoiceSearch() {
+  const micBtn = document.getElementById("mic-btn");
+  if (!micBtn) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return; // unsupported browser: leave the mic hidden
+
+  micBtn.hidden = false;
+  let recognizing = false;
+  let recognition = null;
+
+  micBtn.addEventListener("click", () => {
+    if (recognizing && recognition) { recognition.stop(); return; }
+    recognition = new SR();
+    recognition.lang = "ta-IN";        // Tamil; the engine still returns text we can search
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      recognizing = true;
+      micBtn.classList.add("listening");
+      micBtn.setAttribute("aria-label", "Listening… tap to stop");
+    };
+    const done = () => {
+      recognizing = false;
+      micBtn.classList.remove("listening");
+      micBtn.setAttribute("aria-label", "Voice search");
+    };
+    recognition.onend = done;
+    recognition.onerror = done;
+    recognition.onresult = (event) => {
+      const said = (event.results[0] && event.results[0][0] && event.results[0][0].transcript) || "";
+      if (said) {
+        searchEl.value = said.trim();
+        render(filter(searchEl.value));
+        updateRangeBarVisibility();
+        searchEl.focus();
+      }
+    };
+    try { recognition.start(); } catch (e) { done(); }
+  });
+}
+
 function init(data) {
   SONGS = data.map((s) => ({ ...s, _roman: translit(s.t) }));
   render(SONGS);
@@ -362,6 +407,8 @@ function init(data) {
     render(filter(searchEl.value));
     updateRangeBarVisibility();
   });
+
+  setupVoiceSearch();
 
   // Range jump chips.
   if (rangeEl) {

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=18" />
 </head>
 <body>
   <div class="app">
@@ -20,14 +20,17 @@
 
     <div class="stickytop">
       <div class="searchbar">
-        <input
-          id="search"
-          type="search"
-          inputmode="search"
-          autocomplete="off"
-          placeholder="பாடல் எண் அல்லது சொல் தேடு  ·  Search number or word"
-          aria-label="Search songs by number or first word"
-        />
+        <div class="search-input-row">
+          <input
+            id="search"
+            type="search"
+            inputmode="search"
+            autocomplete="off"
+            placeholder="பாடல் எண் அல்லது சொல் தேடு  ·  Search number or word"
+            aria-label="Search songs by number or first word"
+          />
+          <button class="mic-btn" id="mic-btn" type="button" hidden aria-label="Voice search">🎤</button>
+        </div>
         <div class="count" id="count"></div>
       </div>
 
@@ -76,8 +79,8 @@
 
   <button class="to-top" id="to-top" type="button" hidden aria-label="Back to top">↑</button>
 
-  <script src="store.js?v=17"></script>
-  <script src="audio.js?v=17"></script>
-  <script src="app.js?v=17"></script>
+  <script src="store.js?v=18"></script>
+  <script src="audio.js?v=18"></script>
+  <script src="app.js?v=18"></script>
 </body>
 </html>

@@ -84,6 +84,33 @@ html, body {
   outline: none;
 }
 .searchbar input:focus { border-color: var(--gold); }
+.search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-input-row input { flex: 1; }
+.mic-btn {
+  flex: 0 0 auto;
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mic-btn:active { transform: scale(.94); }
+.mic-btn.listening {
+  background: var(--accent);
+  border-color: var(--accent);
+  animation: micpulse 1s ease-in-out infinite;
+}
+@keyframes micpulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,.5); }
+  50%      { box-shadow: 0 0 0 8px rgba(192,57,43,0); }
+}
 .count {
   margin: 6px 2px 0;
   font-size: 12px;
