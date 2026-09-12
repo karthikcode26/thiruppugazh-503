@@ -34,7 +34,7 @@
   function load() {
     if (cache) return Promise.resolve(cache);
     if (pending) return pending;
-    pending = fetch("audio.json?v=25")
+    pending = fetch("audio.json?v=26")
       .then(function (r) { return r.ok ? r.json() : {}; })
       .then(function (data) {
         cache = data && typeof data === "object" ? data : {};
