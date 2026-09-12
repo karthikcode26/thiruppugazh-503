@@ -207,11 +207,22 @@ the bucket. The `audio.json` manifest itself **is** committed.
 
 ## Cache busting
 
-`index.html` and `song.html` load `styles.css`, `store.js`, and `app.js` with a
-version query (e.g. `app.js?v=2`). Browsers (especially iOS Safari) cache these
-files aggressively; bumping the number forces every device to fetch the new
-version immediately. **When you change any of those three files, increment the
-`?v=` number in both HTML files** before deploying.
+The site loads its assets **and data files** with a version query (e.g.
+`app.js?v=22`, `audio.json?v=22`, `songs.json?v=22`). Browsers (especially iOS
+Safari) cache these aggressively; bumping the number forces every device to
+fetch the new version immediately.
+
+**Whenever you change any of these, bump the `?v=` number to the same new value
+everywhere it appears, then deploy:**
+
+- `styles.css`, `store.js`, `audio.js`, `app.js` — the `?v=` in `index.html` and
+  `song.html`.
+- `audio.json` — the `?v=` in `audio.js` (the `fetch("audio.json?v=…")`).
+- `songs.json` — the `?v=` in `app.js` and `song.html`.
+
+Editing `audio.json` (adding videos/audio) counts as a change — bump the version
+so phones don't keep serving a stale copy. A repo-wide find/replace of the old
+`?v=N` to the new number is the easy way.
 
 ## Deploy to the existing S3 website
 
