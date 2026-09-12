@@ -1,6 +1,9 @@
 {
   "10": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/10.mp3" } },
   "26": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/26.mp3" } },
+  "187": { "extra": [
+    { "label": "Virutham followed by Tiruppugazh Pattil urugily", "type": "video", "youtubeId": "uKRmUeRwWZ0" }
+  ] },
   "455": { "extra": [
     { "label": "Virutham in Sivaranjani followed by song Kayalvizhi", "type": "video", "youtubeId": "zLWO6dXnWUc" }
   ] }
