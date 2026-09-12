@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=24" />
+  <link rel="stylesheet" href="styles.css?v=25" />
 </head>
 <body>
   <div class="app">
@@ -26,8 +26,8 @@
     </footer>
   </div>
 
-  <script src="store.js?v=24"></script>
-  <script src="audio.js?v=24"></script>
+  <script src="store.js?v=25"></script>
+  <script src="audio.js?v=25"></script>
   <script>
     (function () {
       const rawNumber = new URLSearchParams(location.search).get("n") || "";
@@ -42,7 +42,7 @@
         })[character]);
       }
 
-      fetch("songs.json?v=24")
+      fetch("songs.json?v=25")
         .then(response => {
           if (!response.ok) throw new Error("Could not load songs");
           return response.json();

@@ -581,7 +581,7 @@ function init(data) {
   }
 }
 
-fetch("songs.json?v=24")
+fetch("songs.json?v=25")
   .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
   .then(init)
   .catch(() => {
