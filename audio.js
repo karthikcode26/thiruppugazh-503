@@ -34,7 +34,7 @@
   function load() {
     if (cache) return Promise.resolve(cache);
     if (pending) return pending;
-    pending = fetch("audio.json?v=23")
+    pending = fetch("audio.json?v=24")
       .then(function (r) { return r.ok ? r.json() : {}; })
       .then(function (data) {
         cache = data && typeof data === "object" ? data : {};
@@ -44,9 +44,10 @@
     return pending;
   }
 
-  // Return { main: entry|null, extra: [validEntry...] } for a song number.
+  // Return { guru: entry|null, main: entry|null, extra: [validEntry...] } for a song.
   function forSong(data, num) {
     var entry = data && data[String(num)];
+    var guru = entry && isValidAudio(entry.guru) ? entry.guru : null;
     var main = entry && isValidAudio(entry.main) ? entry.main : null;
     var extra = [];
     if (entry && Array.isArray(entry.extra)) {
@@ -54,7 +55,7 @@
         if (isValidEntry(entry.extra[i])) extra.push(entry.extra[i]);
       }
     }
-    return { main: main, extra: extra };
+    return { guru: guru, main: main, extra: extra };
   }
 
   global.TPAudio = { load: load, forSong: forSong, isValidVideo: isValidVideo, isValidAudio: isValidAudio };

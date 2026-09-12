@@ -165,6 +165,8 @@ republish; Arunagirinathar's original verses are public domain.
 
 Audio is driven by **`audio.json`** (song number → recordings). Each song can have:
 
+- one **`guru`** recording (your teacher's audio) — shown in a highlighted
+  "Guru — Shri N.V. Vaidyanathan" section **above the lyrics** on the song page;
 - one **`main`** recording (the consistent main singer) — a ▶/⏸ button on the
   home-page row plays it inline (one song at a time), and it also shows as a mini
   player on the song page;
@@ -185,7 +187,18 @@ Audio is driven by **`audio.json`** (song number → recordings). Each song can 
 }
 ```
 
-- **Audio** entries need `type:"audio"` and `src` (an `audio/...mp3` path).
+Guru recording example (self-hosted, e.g. WhatsApp audio in an `.mp4` container):
+
+```json
+"289": {
+  "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/289.mp4" }
+}
+```
+
+Put Guru files under `audio/guru/` (`.mp4`, `.m4a`, or `.mp3`); `deploy.sh`
+uploads them with the right content type. They are git-ignored like other audio.
+
+- **Audio** entries need `type:"audio"` and `src` (an `audio/...` path — mp3/m4a/mp4).
 - **Video** entries need `type:"video"` and an 11-char `youtubeId` (nothing is
   stored by us; it streams from YouTube).
 - Songs missing from `audio.json`, or without a valid `main`, simply show no

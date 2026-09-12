@@ -59,6 +59,15 @@ if [[ -d audio ]]; then
     --exclude "*" --include "*.mp3" \
     --content-type "audio/mpeg" \
     ${DRY_RUN}
+  # Guru recordings arrived as WhatsApp audio in .mp4/.m4a containers (AAC).
+  aws s3 sync audio "s3://${BUCKET}/audio" \
+    --exclude "*" --include "*.m4a" \
+    --content-type "audio/mp4" \
+    ${DRY_RUN}
+  aws s3 sync audio "s3://${BUCKET}/audio" \
+    --exclude "*" --include "*.mp4" \
+    --content-type "audio/mp4" \
+    ${DRY_RUN}
 fi
 
 if [[ -n "$DRY_RUN" ]]; then

@@ -375,6 +375,21 @@ html, body {
 }
 .audio-main { margin-bottom: 18px; }
 .audio-el { width: 100%; display: block; }
+
+/* Guru's recording — highlighted, above the lyrics */
+.guru {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, #fff4e0, #fffaf0);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.guru-title {
+  color: var(--accent-dark);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 8px;
+}
 .extras { margin-bottom: 18px; }
 .extra-item {
   background: var(--card);
