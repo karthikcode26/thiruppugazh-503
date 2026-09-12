@@ -3,21 +3,34 @@
   "26": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/26.mp3" } },
   "52": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/52.m4a" } },
   "54": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/54.mp3" } },
+  "57": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/57.mp3" } },
   "106": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/106.m4a" } },
+  "149": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/149.mp3" } },
   "160": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/160.m4a" } },
+  "165": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/165.mp3" } },
   "185": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/185.mp3" } },
   "187": { "extra": [
     { "label": "Virutham followed by Tiruppugazh Pattil urugily", "type": "video", "youtubeId": "uKRmUeRwWZ0" }
   ] },
+  "189": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/189.mp3" } },
+  "224": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/224.mp3" } },
+  "247": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/247.mp3" } },
   "289": { "extra": [
     { "label": "Ranjani Virutham for Song Uraiyum chendradhu by Shri N V Vaidyanathan", "type": "video", "youtubeId": "jdpNXF8h_cs" }
   ] },
   "302": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/302.mp3" } },
+  "312": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/312.mp3" } },
+  "323": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/323.mp3" } },
+  "324": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/324.mp3" } },
+  "325": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/325.mp3" } },
+  "328": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/328.mp3" } },
+  "330": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/330.mp3" } },
   "351": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/351.mp4" } },
   "372": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/372.m4a" } },
   "373": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/373.m4a" } },
   "455": { "extra": [
     { "label": "Virutham in Sivaranjani followed by song Kayalvizhi", "type": "video", "youtubeId": "zLWO6dXnWUc" }
   ] },
-  "485": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/485.m4a" } }
+  "485": { "guru": { "label": "Guru", "type": "audio", "src": "audio/guru/485.m4a" } },
+  "495": { "main": { "label": "Main singer", "type": "audio", "src": "audio/main/495.mp3" } }
 }
