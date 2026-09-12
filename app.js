@@ -107,6 +107,16 @@ function editDistance(a, b) {
 // Score a song's sound key against the query sound key. Lower = better match;
 // returns null if it should not match at all. Ranks: exact < prefix < substring
 // < close-by-edit-distance.
+// Is qKey a subsequence of songKey (all chars appear in order, gaps allowed)?
+// Helps when voice dictation drops middle sounds, e.g. "kala" inside "kaitala".
+function isSubsequence(q, s) {
+  let i = 0;
+  for (let j = 0; j < s.length && i < q.length; j++) {
+    if (s[j] === q[i]) i++;
+  }
+  return i === q.length;
+}
+
 function phoneticScore(songKey, qKey) {
   if (!qKey) return null;
   if (songKey === qKey) return 0;
@@ -121,6 +131,12 @@ function phoneticScore(songKey, qKey) {
   const head = songKey.slice(0, qKey.length + tolerance);
   const dist = editDistance(qKey, head);
   if (dist <= tolerance) return 3 + dist;
+  // Last resort for dropped-sound dictations (e.g. "kala" -> "kaitala"):
+  // the query's sounds appear in order within the song key, and the song key
+  // isn't wildly longer than the query. Ranked lowest so exact matches win.
+  if (qKey.length >= 3 && songKey.length <= qKey.length * 2 + 2 && isSubsequence(qKey, songKey)) {
+    return 8 + (songKey.length - qKey.length);
+  }
   return null;
 }
 
