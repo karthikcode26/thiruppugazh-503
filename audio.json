@@ -7,9 +7,6 @@
   "114": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/114.mp3"}},
   "149": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/149.mp3"}},
   "165": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/165.mp3"}},
-  "187": { "extra": [
-    {"label": "Virutham followed by Tiruppugazh Pattil urugily", "type": "video", "youtubeId": "uKRmUeRwWZ0"}
-  ] },
   "188": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/188.mp3"}},
   "189": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/189.mp3"}},
   "193": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/193.mp3"}},
@@ -18,9 +15,6 @@
   "243": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/243.mp3"}},
   "247": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/247.mp3"}},
   "255": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/255.mp3"}},
-  "289": { "extra": [
-    {"label": "Ranjani Virutham for Song Uraiyum chendradhu by Shri N V Vaidyanathan", "type": "video", "youtubeId": "jdpNXF8h_cs"}
-  ] },
   "312": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/312.mp3"}},
   "323": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/323.mp3"}},
   "324": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/324.mp3"}},
@@ -28,8 +22,5 @@
   "327": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/327.mp3"}},
   "328": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/328.mp3"}},
   "330": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/330.mp3"}},
-  "455": { "extra": [
-    {"label": "Virutham in Sivaranjani followed by song Kayalvizhi", "type": "video", "youtubeId": "zLWO6dXnWUc"}
-  ] },
   "495": {"main": {"label": "Main singer", "type": "audio", "src": "audio/main/495.mp3"}}
 }
